@@ -58,6 +58,25 @@ npm run build
 
 ## Deployment
 
-- Recommended: Vercel for frontend + cron triggers.
-- Use managed Postgres/Redis in production.
-- Set `APP_URL` to `https://virus-tracker.com` in environment variables.
+### Netlify (request refresh + SWR cache)
+
+This project includes `netlify.toml` and is configured for request-driven stale-while-revalidate behavior.
+
+Required environment variables on Netlify:
+
+- `APP_URL` (e.g. `https://virus-tracker.com`)
+- `INGESTION_TTL_SECONDS` (recommended: `1800`)
+- `REVALIDATE_SECONDS` (recommended: `1800`)
+- `INGESTION_ADMIN_KEY` (optional but recommended)
+- `UPSTASH_REDIS_REST_URL` (recommended for shared cache across function instances)
+- `UPSTASH_REDIS_REST_TOKEN` (recommended for shared cache across function instances)
+
+SWR behavior:
+- API routes serve cached snapshots with `Cache-Control: public, s-maxage=1800, stale-while-revalidate=1800`.
+- If snapshot is stale, stale data is served and refresh runs in background.
+- If no snapshot exists, request computes and stores a fresh snapshot.
+
+### Other platforms
+
+- Vercel is still supported.
+- Use managed Redis/Postgres in production for stronger durability and performance.

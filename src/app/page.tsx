@@ -15,7 +15,7 @@ import { env } from "@/lib/config";
 import { slugify } from "@/lib/seo";
 import { getDashboardSnapshot, getFilteredDashboardView } from "@/server/dashboard-service";
 
-export const revalidate = 300;
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Global Emerging Threat Dashboard",

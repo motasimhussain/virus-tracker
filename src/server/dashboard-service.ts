@@ -13,16 +13,23 @@ import {
   rankHotspots,
 } from "@/server/analysis";
 import { runIngestion } from "@/server/data/ingestion";
+import {
+  getSnapshotFromSharedCache,
+  setSnapshotToSharedCache,
+  type CacheEnvelope,
+  type SourceHealthRecord,
+} from "@/server/cache/snapshot-cache";
 import { fallbackTrajectory } from "@/server/data/fallback-data";
 
 type CachedSnapshot = {
   value: DashboardSnapshot;
-  expiresAt: number;
-  sourceHealth: Array<{ source: string; healthy: boolean; message: string }>;
+  sourceHealth: SourceHealthRecord[];
+  generatedAtMs: number;
 };
 
 const globalCache = globalThis as typeof globalThis & {
   virusTrackerCache?: CachedSnapshot;
+  refreshInFlight?: Promise<DashboardSnapshot>;
 };
 
 function applyFallbackTrajectory(viruses: VirusSnapshot[]): VirusSnapshot[] {
@@ -34,29 +41,75 @@ function applyFallbackTrajectory(viruses: VirusSnapshot[]): VirusSnapshot[] {
 
 export async function getDashboardSnapshot(forceRefresh = false): Promise<DashboardSnapshot> {
   const now = Date.now();
-  const existing = globalCache.virusTrackerCache;
-  if (!forceRefresh && existing && existing.expiresAt > now) {
-    return existing.value;
+  const l1 = globalCache.virusTrackerCache;
+  const freshUntil = (l1?.generatedAtMs ?? 0) + env.INGESTION_TTL_SECONDS * 1000;
+  const staleUntil = freshUntil + env.REVALIDATE_SECONDS * 1000;
+
+  if (!forceRefresh && l1 && now <= freshUntil) {
+    return l1.value;
   }
 
+  const l2 = await getSnapshotFromSharedCache();
+  if (!forceRefresh && l2) {
+    hydrateL1FromEnvelope(l2);
+    const l2FreshUntil = l2.generatedAtMs + env.INGESTION_TTL_SECONDS * 1000;
+    const l2StaleUntil = l2FreshUntil + env.REVALIDATE_SECONDS * 1000;
+    if (now <= l2FreshUntil) {
+      return l2.snapshot;
+    }
+    if (now <= l2StaleUntil) {
+      void ensureRefresh();
+      return l2.snapshot;
+    }
+  }
+
+  if (!forceRefresh && l1 && now <= staleUntil) {
+    void ensureRefresh();
+    return l1.value;
+  }
+
+  return ensureRefresh();
+}
+
+function hydrateL1FromEnvelope(payload: CacheEnvelope) {
+  globalCache.virusTrackerCache = {
+    value: payload.snapshot,
+    sourceHealth: payload.sourceHealth,
+    generatedAtMs: payload.generatedAtMs,
+  };
+}
+
+async function refreshSnapshot(): Promise<DashboardSnapshot> {
   const ingestion = await runIngestion();
   const viruses = applyFallbackTrajectory(mergeVirusSnapshots(ingestion.metrics));
   const hotspots = rankHotspots(ingestion.metrics);
+  const generatedAtMs = Date.now();
 
   const snapshot: DashboardSnapshot = {
-    generatedAt: new Date().toISOString(),
+    generatedAt: new Date(generatedAtMs).toISOString(),
     viruses,
     hotspots,
     news: ingestion.news,
   };
 
-  globalCache.virusTrackerCache = {
-    value: snapshot,
-    expiresAt: now + env.INGESTION_TTL_SECONDS * 1000,
+  const envelope: CacheEnvelope = {
+    snapshot,
     sourceHealth: ingestion.sourceHealth,
+    generatedAtMs,
   };
+  hydrateL1FromEnvelope(envelope);
+  await setSnapshotToSharedCache(envelope);
 
   return snapshot;
+}
+
+function ensureRefresh(): Promise<DashboardSnapshot> {
+  if (!globalCache.refreshInFlight) {
+    globalCache.refreshInFlight = refreshSnapshot().finally(() => {
+      globalCache.refreshInFlight = undefined;
+    });
+  }
+  return globalCache.refreshInFlight;
 }
 
 export function getSourceHealth() {

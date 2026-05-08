@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { env } from "@/lib/config";
 import { getDashboardSnapshot, getFilteredDashboardView } from "@/server/dashboard-service";
 
 export async function GET(request: Request) {
@@ -36,6 +37,11 @@ export async function GET(request: Request) {
       selectedThreat: filteredView.selectedThreatKey,
       maxActiveCases: maxActive,
     },
-    { status: 200 },
+    {
+      status: 200,
+      headers: {
+        "Cache-Control": `public, s-maxage=${env.REVALIDATE_SECONDS}, stale-while-revalidate=${env.REVALIDATE_SECONDS}`,
+      },
+    },
   );
 }

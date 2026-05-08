@@ -6,7 +6,7 @@ import { WorldHeatMap } from "@/components/map/WorldHeatMap";
 import { env } from "@/lib/config";
 import { getDashboardSnapshot, getFilteredDashboardView } from "@/server/dashboard-service";
 
-export const revalidate = 300;
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Global Heat Map",

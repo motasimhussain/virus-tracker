@@ -11,7 +11,7 @@ type VirusDetailsPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 300;
+export const revalidate = 1800;
 
 export async function generateMetadata({ params }: VirusDetailsPageProps): Promise<Metadata> {
   const { slug } = await params;

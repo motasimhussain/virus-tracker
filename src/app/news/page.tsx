@@ -7,7 +7,7 @@ import { env } from "@/lib/config";
 import { slugify } from "@/lib/seo";
 import { getDashboardSnapshot } from "@/server/dashboard-service";
 
-export const revalidate = 180;
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Outbreak News",
