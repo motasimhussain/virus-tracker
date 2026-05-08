@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Virus Tracker
 
-## Getting Started
+Virus Tracker is an SSR-first Next.js application for monitoring global virus spread through heat zones, trend analysis, trajectory forecasts, and realtime news ingestion from open feeds.
 
-First, run the development server:
+## Core Features
+
+- Global outbreak dashboard with top hotspots and trend cards.
+- Heat map view with geospatial coordinates per region.
+- Virus-specific detail pages with trajectory projection.
+- Public news aggregation through RSS ingestion.
+- Provider-agnostic ad slots for future ad network integration.
+- Security headers, sitemap, robots, and API endpoints for frontend/data clients.
+
+## Tech Stack
+
+- Next.js App Router (SSR + revalidation)
+- TypeScript + Tailwind CSS
+- Runtime validation with Zod
+- RSS parsing via `rss-parser`
+- Vitest for unit tests
+- Optional local Postgres + Redis via Docker Compose
+
+## Local Development
 
 ```bash
+npm install
+cp .env.example .env
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Data and APIs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `GET /api/overview` - full dashboard snapshot
+- `GET /api/map` - map-ready hotspot coordinates
+- `GET /api/news` - normalized news feed
+- `GET /api/ingestion` - force refresh + source health
+  - Optional protection via `INGESTION_ADMIN_KEY` and `x-admin-key` request header.
 
-## Learn More
+Sources currently include:
+- `disease.sh` country-level COVID dataset
+- Google News RSS outbreak search feed
+- Internal resilient fallback datasets for other viruses
 
-To learn more about Next.js, take a look at the following resources:
+## Ads
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Ad slots are implemented as provider-agnostic UI containers in `src/components/ads/AdSlot.tsx`.
+Attach approved provider SDK snippets (AdSense, Media.net, APS, etc.) after policy and consent compliance checks.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Verification
 
-## Deploy on Vercel
+```bash
+npm run lint
+npm run test
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Recommended: Vercel for frontend + cron triggers.
+- Use managed Postgres/Redis in production.
+- Set `APP_URL` to `https://virus-tracker.com` in environment variables.
