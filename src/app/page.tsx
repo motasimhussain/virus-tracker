@@ -108,7 +108,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         </div>
       </section>
 
-      <AdSlot slotName="Top Banner 970x90" className="w-full" />
+      <AdSlot placement="top-banner" slotName="Top Banner 970x90" className="w-full" />
 
       <ThreatFilters
         virusOptions={filteredView.virusOptions}
@@ -147,8 +147,8 @@ export default async function Home({ searchParams }: HomePageProps) {
       <section className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <NewsFeed items={snapshot.news.slice(0, 20)} />
         <div className="space-y-4">
-          <AdSlot slotName="Sidebar Rail 300x600" />
-          <AdSlot slotName="In-Feed 336x280" />
+          <AdSlot placement="sidebar" slotName="Sidebar Rail 300x600" />
+          <AdSlot placement="in-feed" slotName="In-Feed 336x280" />
         </div>
       </section>
     </div>

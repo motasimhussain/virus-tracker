@@ -45,8 +45,17 @@ Sources currently include:
 
 ## Ads
 
-Ad slots are implemented as provider-agnostic UI containers in `src/components/ads/AdSlot.tsx`.
-Attach approved provider SDK snippets (AdSense, Media.net, APS, etc.) after policy and consent compliance checks.
+Google AdSense is integrated in `src/components/ads/AdSlot.tsx` and `src/app/layout.tsx` (async script + verification meta).
+
+1. In [AdSense](https://www.google.com/adsense/), create **Display** ad units for each placement.
+2. Set environment variables (e.g. on Netlify):
+
+- `NEXT_PUBLIC_ADSENSE_CLIENT` — publisher ID (`ca-pub-…`, default matches site meta)
+- `NEXT_PUBLIC_ADSENSE_SLOT_TOP_BANNER` — slot ID for the top banner unit
+- `NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR` — slot ID for the sidebar unit
+- `NEXT_PUBLIC_ADSENSE_SLOT_IN_FEED` — slot ID for the in-feed unit
+
+Until slot IDs are set, placeholders explain which variable to configure. Ensure your privacy/consent setup meets AdSense policy in your regions.
 
 ## Verification
 
