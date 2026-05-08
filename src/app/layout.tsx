@@ -40,6 +40,9 @@ export const metadata: Metadata = {
     description:
       "Track emerging global threats and viruses with realtime heat zones and trajectory analysis.",
   },
+  other: {
+    "google-adsense-account": "ca-pub-2437840875186827",
+  },
 };
 
 export default function RootLayout({
