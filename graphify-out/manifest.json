@@ -1,0 +1,246 @@
+{
+  "D:\\Claude\\virus-tracker\\eslint.config.mjs": {
+    "mtime": 1778229434.920621,
+    "hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "D:\\Claude\\virus-tracker\\next-env.d.ts": {
+    "mtime": 1778347383.714273,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "D:\\Claude\\virus-tracker\\next.config.ts": {
+    "mtime": 1778337952.1957016,
+    "hash": "d7906d96928644e3c4ecdf511b46b8a0"
+  },
+  "D:\\Claude\\virus-tracker\\postcss.config.mjs": {
+    "mtime": 1778229434.9369798,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "D:\\Claude\\virus-tracker\\vitest.config.ts": {
+    "mtime": 1778229838.7007613,
+    "hash": "28f5937f46fa81d04f6aec75861952b2"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\layout.tsx": {
+    "mtime": 1778347755.9336174,
+    "hash": "ba69d52eb6c59042547522567bea8c8e"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\page.tsx": {
+    "mtime": 1778279055.1697032,
+    "hash": "d83999d02f36f07ea272469e347fd168"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\robots.ts": {
+    "mtime": 1778246260.6698265,
+    "hash": "5c7786f6dc7a871ca876ea13f8f70f5c"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\sitemap.ts": {
+    "mtime": 1778347755.0852907,
+    "hash": "efbb9ebaf9598bfb61967fb662336330"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\api\\ingestion\\route.ts": {
+    "mtime": 1778229953.582874,
+    "hash": "ba72c8697ca11288ba9246428f21bf9f"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\api\\map\\route.ts": {
+    "mtime": 1778249577.8163767,
+    "hash": "a68d3fd0235210ad367bf48d6b570603"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\api\\news\\route.ts": {
+    "mtime": 1778249577.8168766,
+    "hash": "25339b7edf9f07d87dee560589564dd2"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\api\\overview\\route.ts": {
+    "mtime": 1778249577.8173766,
+    "hash": "781cde89b254c373404bd3646fa486b5"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\map\\page.tsx": {
+    "mtime": 1778249577.8173766,
+    "hash": "821289ad0e102343b2609165d6a205e5"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\news\\page.tsx": {
+    "mtime": 1778249577.8183792,
+    "hash": "523dc6352eae476442d485790fe673f7"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\news\\source\\[sourceSlug]\\page.tsx": {
+    "mtime": 1778246437.6458702,
+    "hash": "475a167e3e8975d72c3fb007adae73c0"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\news\\topic\\[virusTag]\\page.tsx": {
+    "mtime": 1778246703.0943992,
+    "hash": "048abc14c1a74dbdc2166614156fe556"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\regions\\[countryCode]\\page.tsx": {
+    "mtime": 1778246348.1963916,
+    "hash": "4e361c33a787371566d2a26a66ab48cd"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\regions\\[countryCode]\\[virusSlug]\\page.tsx": {
+    "mtime": 1778246362.319957,
+    "hash": "53339e63483f23e08f0404157c9c4401"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\threats\\[virusSlug]\\[threatSlug]\\page.tsx": {
+    "mtime": 1778246334.6947815,
+    "hash": "bd440cdf59b7a9a2d2e40848aeaa5bfe"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\viruses\\page.tsx": {
+    "mtime": 1778347754.2395246,
+    "hash": "4e70ab66f2c8c8857e04e8f2c996561c"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\viruses\\[slug]\\page.tsx": {
+    "mtime": 1778347773.6360123,
+    "hash": "4a583fd88f296bbd1da5cd152f9ccab0"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\ads\\AdSlot.tsx": {
+    "mtime": 1778279050.390781,
+    "hash": "696b68a23627c531ba261f3c03b1e2d1"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\HeatList.tsx": {
+    "mtime": 1778242212.5682044,
+    "hash": "9ba9342d27a5b7d8a123ccb3ffc699d7"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\MetricCard.tsx": {
+    "mtime": 1778229629.9466445,
+    "hash": "3de4b48a84e75ee4d0ebee1e61f92cff"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\NewsFeed.tsx": {
+    "mtime": 1778229648.8869047,
+    "hash": "c4875caf813f741a4bfb2888158d69af"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\SeverityByRegionPanel.tsx": {
+    "mtime": 1778244386.2735934,
+    "hash": "250210ccd6e5a6a50ac73e6a20dd086e"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\SourceReliabilityPanel.tsx": {
+    "mtime": 1778244396.4907706,
+    "hash": "a1a980b92e58c9d0e2ab00fb5c6a276d"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\ThreatFilters.tsx": {
+    "mtime": 1778241187.9487443,
+    "hash": "1328189a26a4b4e7ae23f8224697dcff"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\ThreatMatrixPanel.tsx": {
+    "mtime": 1778244378.893184,
+    "hash": "e80b415d45d31e5431ffd67f391e0bc1"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\TopThreatCards.tsx": {
+    "mtime": 1778244061.546803,
+    "hash": "713dcd599a403466c3d7b0b6b99d2775"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\TopThreatPicker.tsx": {
+    "mtime": 1778241180.58106,
+    "hash": "a34748a2be0e626487d5b81dbb8918dd"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\TrajectoryChart.tsx": {
+    "mtime": 1778244370.410326,
+    "hash": "735499a28f0be298eb65f6997b56ac7c"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\dashboard\\VirusPicker.tsx": {
+    "mtime": 1778241174.2693,
+    "hash": "7bbd8276f36291ed941f68bf3b810cd5"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\map\\WorldHeatMap.tsx": {
+    "mtime": 1778347369.2371125,
+    "hash": "e632aacd950c99b22aab4542a0340856"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\virus\\VirusRegionalBarChart.tsx": {
+    "mtime": 1778347372.0452576,
+    "hash": "af639b1799accce55420dddb91176e1b"
+  },
+  "D:\\Claude\\virus-tracker\\src\\components\\wiki\\VirusWikiIndexNav.tsx": {
+    "mtime": 1778347730.3341875,
+    "hash": "f3926e3f31dcb33e51555a776781e8ad"
+  },
+  "D:\\Claude\\virus-tracker\\src\\data\\virus-wiki.ts": {
+    "mtime": 1778347279.0434003,
+    "hash": "4f8f40f92253c73d4f43044fb4a70d2d"
+  },
+  "D:\\Claude\\virus-tracker\\src\\lib\\config.ts": {
+    "mtime": 1778337937.814633,
+    "hash": "1089ee512a629b4546063c15679b19cc"
+  },
+  "D:\\Claude\\virus-tracker\\src\\lib\\map-scale.ts": {
+    "mtime": 1778241199.920081,
+    "hash": "7fd881569ba87d460100bbcd80498b4c"
+  },
+  "D:\\Claude\\virus-tracker\\src\\lib\\seo.ts": {
+    "mtime": 1778246250.2719848,
+    "hash": "d79a5acb80c771633b2fcee117cad866"
+  },
+  "D:\\Claude\\virus-tracker\\src\\lib\\types.ts": {
+    "mtime": 1778244331.1549907,
+    "hash": "d2d0de8ccfc35d4896a05f9e236f1506"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\analysis.test.ts": {
+    "mtime": 1778244416.3926957,
+    "hash": "632245a7d883e496a5e0e9cc3f69d8c7"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\analysis.ts": {
+    "mtime": 1778244348.3952944,
+    "hash": "0002ef584f09df6eb138e4f67b63cac2"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\dashboard-service.ts": {
+    "mtime": 1778249577.8218832,
+    "hash": "ffddb52cb1bcd4bdd87268742704a5a8"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\cache\\snapshot-cache.ts": {
+    "mtime": 1778249577.8213828,
+    "hash": "7dca5a2389f2152c00ff568332aaee38"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\data\\fallback-data.ts": {
+    "mtime": 1778243509.210119,
+    "hash": "d43b9501e2c7fb488ef247590d8a5e95"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\data\\ingestion.ts": {
+    "mtime": 1778242590.1740105,
+    "hash": "d8ec0087d567e860bf4a750e05f3de75"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\data\\location-normalization.test.ts": {
+    "mtime": 1778242271.212806,
+    "hash": "0a159bda3323093ea4bc566c03eed396"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\data\\location-normalization.ts": {
+    "mtime": 1778242115.1375835,
+    "hash": "a0b97bff0b77b5fc8418b84979859413"
+  },
+  "D:\\Claude\\virus-tracker\\src\\server\\db\\schema.sql": {
+    "mtime": 1778229815.1229084,
+    "hash": "4158eca6e57afc0f3a5324196cc5d7ca"
+  },
+  "D:\\Claude\\virus-tracker\\src\\types\\adsense.d.ts": {
+    "mtime": 1778279040.0743241,
+    "hash": "ad22e449b68ed7cfbdfbaadba84f24a5"
+  },
+  "D:\\Claude\\virus-tracker\\AGENTS.md": {
+    "mtime": 1778229484.5117333,
+    "hash": "9e09241799026ac05be315a2f0b50055"
+  },
+  "D:\\Claude\\virus-tracker\\CLAUDE.md": {
+    "mtime": 1778229484.5122313,
+    "hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "D:\\Claude\\virus-tracker\\docker-compose.yml": {
+    "mtime": 1778229764.0153449,
+    "hash": "722e3be25c9afadea3118c1c46e1fdf6"
+  },
+  "D:\\Claude\\virus-tracker\\README.md": {
+    "mtime": 1778279076.8621297,
+    "hash": "ee3b27ef3da098b97928a2da32678a1e"
+  },
+  "D:\\Claude\\virus-tracker\\public\\file.svg": {
+    "mtime": 1778229434.9414794,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "D:\\Claude\\virus-tracker\\public\\globe.svg": {
+    "mtime": 1778229434.9489934,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "D:\\Claude\\virus-tracker\\public\\next.svg": {
+    "mtime": 1778229434.9580028,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "D:\\Claude\\virus-tracker\\public\\vercel.svg": {
+    "mtime": 1778229434.9655023,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "D:\\Claude\\virus-tracker\\public\\window.svg": {
+    "mtime": 1778229434.9709642,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  }
+}

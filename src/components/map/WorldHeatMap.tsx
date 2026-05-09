@@ -8,6 +8,12 @@ import { getHeatColor } from "@/lib/map-scale";
 
 type WorldHeatMapProps = {
   items: RegionMetric[];
+  /** Override default "World Heat Map" heading (e.g. virus-specific SEO title) */
+  title?: string;
+  /** Optional short description under the heading */
+  description?: string;
+  /** Sets `id` on the heading for `aria-labelledby` on the figure container */
+  sectionId?: string;
 };
 
 const MAP_WIDTH = 960;
@@ -35,8 +41,11 @@ function normalizeCountryName(name: string) {
     .replace("russian federation", "russia");
 }
 
-export function WorldHeatMap({ items }: WorldHeatMapProps) {
-  const maxActiveCases = Math.max(...items.map((item) => item.activeCases), 0);
+export function WorldHeatMap({ items, title, description, sectionId }: WorldHeatMapProps) {
+  const headingId = sectionId ?? "world-heat-map-heading";
+  const headingText = title ?? "World Heat Map";
+  const maxActiveCases =
+    items.length > 0 ? Math.max(...items.map((item) => item.activeCases), 0) : 0;
   const collection = feature(
     worldAtlas as unknown as Parameters<typeof feature>[0],
     (worldAtlas as { objects: { countries: unknown } }).objects.countries as Parameters<typeof feature>[1],
@@ -50,9 +59,15 @@ export function WorldHeatMap({ items }: WorldHeatMapProps) {
   }, {});
 
   return (
-    <div className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4">
-      <h3 className="text-sm uppercase tracking-[0.2em] text-cyan-300">World Heat Map</h3>
-      <div className="mt-4 overflow-hidden rounded-lg border border-cyan-900/30">
+    <section
+      className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4"
+      aria-labelledby={headingId}
+    >
+      <h2 id={headingId} className="text-sm uppercase tracking-[0.2em] text-cyan-300">
+        {headingText}
+      </h2>
+      {description ? <p className="mt-2 text-xs text-cyan-100/75">{description}</p> : null}
+      <div className="mt-4 overflow-hidden rounded-lg border border-cyan-900/30" role="img" aria-label={headingText}>
         <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} className="h-auto w-full bg-slate-950">
           <rect x="0" y="0" width={MAP_WIDTH} height={MAP_HEIGHT} fill="rgba(15,23,42,0.85)" />
           {geographies.map((geoFeature) => {
@@ -87,6 +102,6 @@ export function WorldHeatMap({ items }: WorldHeatMapProps) {
         <span className="rounded border border-orange-400/30 bg-orange-400/30 px-3 py-1">High</span>
         <span className="rounded border border-red-400/30 bg-red-400/30 px-3 py-1">Critical</span>
       </div>
-    </div>
+    </section>
   );
 }

@@ -86,7 +86,10 @@ gtag('config', '${env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');`,
             <Link href="/" className="text-lg font-bold tracking-[0.25em] text-cyan-300">
               VIRUS TRACKER
             </Link>
-            <div className="flex items-center gap-5 text-sm text-cyan-100/80">
+            <div className="flex flex-wrap items-center gap-5 text-sm text-cyan-100/80">
+              <Link href="/viruses" className="hover:text-cyan-300">
+                Wiki
+              </Link>
               <Link href="/map" className="hover:text-cyan-300">
                 Heat Map
               </Link>
