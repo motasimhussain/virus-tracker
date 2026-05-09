@@ -1,16 +1,16 @@
-# Graph Report - virus-tracker  (2026-05-09)
+# Graph Report - virus-tracker  (2026-05-10)
 
 ## Corpus Check
-- 55 files · ~15,598 words
+- 56 files · ~15,783 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 248 nodes · 504 edges · 16 communities (11 shown, 5 thin omitted)
+- 250 nodes · 507 edges · 16 communities (11 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3cbcb2e4`
+- Built from commit: `2a42acf4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,7 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `getDashboardSnapshot()` - 35 edges
-2. `env` - 18 edges
+2. `env` - 19 edges
 3. `getFilteredDashboardView()` - 18 edges
 4. `slugify()` - 11 edges
 5. `deslugify()` - 9 edges
@@ -44,44 +44,44 @@
 ## Surprising Connections (you probably didn't know these)
 - `NewsPage()` --calls--> `getDashboardSnapshot()`  [EXTRACTED]
   src/app/news/page.tsx → src/server/dashboard-service.ts
-- `threatSlugFor()` --calls--> `slugify()`  [EXTRACTED]
-  src/app/threats/[virusSlug]/[threatSlug]/page.tsx → src/lib/seo.ts
-- `ThreatPage()` --calls--> `getDashboardSnapshot()`  [EXTRACTED]
-  src/app/threats/[virusSlug]/[threatSlug]/page.tsx → src/server/dashboard-service.ts
 - `Home()` --calls--> `getDashboardSnapshot()`  [EXTRACTED]
   src/app/page.tsx → src/server/dashboard-service.ts
 - `Home()` --calls--> `getFilteredDashboardView()`  [EXTRACTED]
   src/app/page.tsx → src/server/dashboard-service.ts
+- `sitemap()` --calls--> `getDashboardSnapshot()`  [EXTRACTED]
+  src/app/sitemap.ts → src/server/dashboard-service.ts
+- `GET()` --calls--> `getFilteredDashboardView()`  [EXTRACTED]
+  src/app/api/map/route.ts → src/server/dashboard-service.ts
 
 ## Communities (16 total, 5 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.08
-Nodes (44): CacheEnvelope, getSnapshotFromSharedCache(), setSnapshotToSharedCache(), SourceHealthRecord, upstashGet(), upstashSet(), DashboardSnapshot, VirusSnapshot (+36 more)
+Cohesion: 0.09
+Nodes (43): CacheEnvelope, getSnapshotFromSharedCache(), setSnapshotToSharedCache(), SourceHealthRecord, upstashGet(), upstashSet(), DashboardSnapshot, VirusSnapshot (+35 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.07
-Nodes (25): fallbackMetrics, fallbackNews, fallbackTrajectory, baseMetric(), fetchEcdcWeeklyCovid(), IngestionState, MetricAdapter, NewsAdapter (+17 more)
+Cohesion: 0.08
+Nodes (22): geistMono, geistSans, metadata, sitemap(), RegionPage(), RegionPageProps, GET(), env (+14 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.09
-Nodes (30): AdPlacement, AdSlot(), AdSlotProps, getSlotId(), getSingleParam(), Home(), HomePageProps, metadata (+22 more)
+Cohesion: 0.07
+Nodes (24): fallbackMetrics, fallbackNews, fallbackTrajectory, baseMetric(), fetchEcdcWeeklyCovid(), IngestionState, MetricAdapter, NewsAdapter (+16 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.09
-Nodes (20): geistMono, geistSans, metadata, sitemap(), RegionPage(), RegionPageProps, GET(), env (+12 more)
+Nodes (27): getSingleParam(), Home(), HomePageProps, metadata, SeverityByRegionPanel(), SeverityByRegionPanelProps, SourceReliabilityPanel(), SourceReliabilityPanelProps (+19 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.16
-Nodes (15): NewsFeed(), NewsFeedProps, deslugify(), metadata, NewsPage(), generateMetadata(), NewsSourcePage(), NewsSourcePageProps (+7 more)
+Cohesion: 0.17
+Nodes (16): NewsFeed(), NewsFeedProps, deslugify(), slugify(), NewsItem, metadata, NewsPage(), generateMetadata() (+8 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.11
-Nodes (14): HeatList(), HeatListProps, ThreatFilters(), getHeatColor(), HEAT_COLORS, getSingleParam(), MapPage(), MapPageProps (+6 more)
+Cohesion: 0.12
+Nodes (13): HeatList(), HeatListProps, getHeatColor(), HEAT_COLORS, getSingleParam(), MapPage(), MapPageProps, metadata (+5 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.16
-Nodes (12): SourceReliabilityPanelProps, ThreatFiltersProps, TopThreatCards(), TopThreatCardsProps, TopThreatPicker(), TopThreatPickerProps, VirusPicker(), VirusPickerProps (+4 more)
+Nodes (15): AdPlacement, AdSlot(), AdSlotProps, getSlotId(), MetricCard(), MetricCardProps, getVirusWiki(), getVirusWikiFallback() (+7 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.15
@@ -95,17 +95,17 @@ Nodes (12): Ads, code:bash (npm install), code:bash (npm run lint), Core Feature
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getDashboardSnapshot()` connect `Community 3` to `Community 0`, `Community 2`, `Community 4`, `Community 5`?**
-  _High betweenness centrality (0.094) - this node is a cross-community bridge._
-- **Why does `env` connect `Community 3` to `Community 0`, `Community 2`, `Community 4`, `Community 5`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
-- **Why does `getFilteredDashboardView()` connect `Community 0` to `Community 2`, `Community 5`?**
+- **Why does `getDashboardSnapshot()` connect `Community 1` to `Community 0`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.093) - this node is a cross-community bridge._
+- **Why does `env` connect `Community 1` to `Community 0`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
+- **Why does `getFilteredDashboardView()` connect `Community 0` to `Community 1`, `Community 3`, `Community 5`, `Community 6`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `config` to the rest of the system?**
   _76 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
-- **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.09 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+- **Should `Community 2` be split into smaller, more focused modules?**
+  _Cohesion score 0.07 - nodes in this community are weakly interconnected._

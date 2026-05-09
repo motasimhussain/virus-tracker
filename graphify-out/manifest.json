@@ -4,7 +4,7 @@
     "hash": "dfa1f5f6a7037bf39dc510f30b180002"
   },
   "D:\\Claude\\virus-tracker\\next-env.d.ts": {
-    "mtime": 1778347383.714273,
+    "mtime": 1778354741.882585,
     "hash": "2a74d3909800ca5467fa83b0ab4a4890"
   },
   "D:\\Claude\\virus-tracker\\next.config.ts": {
@@ -34,6 +34,10 @@
   "D:\\Claude\\virus-tracker\\src\\app\\sitemap.ts": {
     "mtime": 1778347755.0852907,
     "hash": "efbb9ebaf9598bfb61967fb662336330"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\ads.txt\\route.ts": {
+    "mtime": 1778354731.0916204,
+    "hash": "47e4c1d2ed60222e2477389809c0fc79"
   },
   "D:\\Claude\\virus-tracker\\src\\app\\api\\ingestion\\route.ts": {
     "mtime": 1778229953.582874,
@@ -242,5 +246,9 @@
   "D:\\Claude\\virus-tracker\\public\\window.svg": {
     "mtime": 1778229434.9709642,
     "hash": "a2760511c65806022ad20adf74370ff3"
+  },
+  "D:\\Claude\\virus-tracker\\src\\app\\favicon.svg": {
+    "mtime": 1778354475.070926,
+    "hash": "f013514f0857166dd7fb189b7a7b6b3c"
   }
 }
