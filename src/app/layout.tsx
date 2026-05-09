@@ -63,6 +63,22 @@ export default function RootLayout({
             crossOrigin="anonymous"
           />
         ) : null}
+        {env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(env.NEXT_PUBLIC_GA_MEASUREMENT_ID)}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');`,
+              }}
+            />
+          </>
+        ) : null}
       </head>
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-100">
         <header className="sticky top-0 z-50 border-b border-cyan-400/20 bg-slate-950/90 backdrop-blur">

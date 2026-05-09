@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https:; frame-src 'self' https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google; object-src 'none'; base-uri 'self'; frame-ancestors 'self';",
+              "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https:; frame-src 'self' https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google; object-src 'none'; base-uri 'self'; frame-ancestors 'self';",
           },
         ],
       },
