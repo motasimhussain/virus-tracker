@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import Link from "next/link";
 import { env } from "@/lib/config";
@@ -56,16 +55,16 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+      <head>
         {env.NEXT_PUBLIC_ADSENSE_CLIENT ? (
-          <Script
-            id="google-adsense"
+          <script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(env.NEXT_PUBLIC_ADSENSE_CLIENT)}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         ) : null}
+      </head>
+      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100">
         <header className="sticky top-0 z-50 border-b border-cyan-400/20 bg-slate-950/90 backdrop-blur">
           <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
             <Link href="/" className="text-lg font-bold tracking-[0.25em] text-cyan-300">
