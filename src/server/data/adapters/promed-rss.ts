@@ -8,22 +8,22 @@ import type { NewsAdapter } from "./types";
 const parser = new Parser();
 
 function safeLink(rawLink: string | undefined): string {
-  if (!rawLink) return "https://news.google.com";
+  if (!rawLink) return "https://promedmail.org";
   return rawLink.startsWith("http://") || rawLink.startsWith("https://")
     ? rawLink
-    : "https://news.google.com";
+    : "https://promedmail.org";
 }
 
 async function fetchNews(): Promise<NewsItem[]> {
-  const rss = await parser.parseURL("https://www.who.int/feeds/entity/csr/don/en/rss.xml");
+  const rss = await parser.parseURL("https://promedmail.org/feed/");
   return (rss.items ?? []).slice(0, 25).map((item, index) => {
-    const title = item.title ?? "WHO DON update";
-    const summary = item.contentSnippet ?? "WHO outbreak bulletin update.";
+    const title = item.title ?? "ProMED-mail update";
+    const summary = item.contentSnippet ?? "ProMED-mail outbreak report.";
     return {
-      id: item.guid ?? `who-don-${index}`,
+      id: item.guid ?? `promed-${index}`,
       title,
       link: safeLink(item.link),
-      source: "WHO Disease Outbreak News",
+      source: "ProMED-mail",
       publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
       summary,
       virusTags: tagNewsItem(title, summary),
@@ -31,9 +31,9 @@ async function fetchNews(): Promise<NewsItem[]> {
   });
 }
 
-export const whoDonAdapter: NewsAdapter = {
-  id: "who-don-rss",
-  sourceName: "who-don-rss",
+export const promedRssAdapter: NewsAdapter = {
+  id: "promed-rss",
+  sourceName: "ProMED-mail",
   kind: "news",
   fetchNews,
 };

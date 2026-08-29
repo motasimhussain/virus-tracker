@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "guid": "cdc-outbreaks-h5n1",
+      "title": "H5N1 Bird Flu: Current Situation Summary",
+      "link": "https://www.cdc.gov/bird-flu/situation-summary/",
+      "pubDate": "Mon, 05 Jan 2026 10:00:00 GMT",
+      "contentSnippet": "CDC's current assessment of the H5N1 bird flu situation in the United States."
+    },
+    {
+      "guid": "cdc-outbreaks-mpox",
+      "title": "Mpox Outbreak Update",
+      "link": "https://www.cdc.gov/mpox/outbreaks/",
+      "pubDate": "Tue, 06 Jan 2026 11:15:00 GMT",
+      "contentSnippet": "Latest case counts and guidance for the ongoing mpox outbreak."
+    },
+    {
+      "guid": "cdc-outbreaks-general",
+      "title": "Recreational Water Illness Prevention Tips",
+      "link": "https://www.cdc.gov/healthywater/",
+      "pubDate": "Wed, 07 Jan 2026 07:45:00 GMT",
+      "contentSnippet": "General guidance unrelated to any specific tracked pathogen."
+    }
+  ]
+}
