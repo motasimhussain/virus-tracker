@@ -1,0 +1,12 @@
+{
+  "@odata.context": "https://ghoapi.azureedge.net/api/$metadata#WHS3_62",
+  "value": [
+    { "Id": 101, "IndicatorCode": "WHS3_62", "SpatialDimType": "COUNTRY", "SpatialDim": "PHL", "TimeDimType": "YEAR", "TimeDim": 2018, "Value": "17,298", "NumericValue": 17298.0 },
+    { "Id": 102, "IndicatorCode": "WHS3_62", "SpatialDimType": "COUNTRY", "SpatialDim": "PHL", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "47,871", "NumericValue": 47871.0 },
+    { "Id": 103, "IndicatorCode": "WHS3_62", "SpatialDimType": "COUNTRY", "SpatialDim": "IND", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "13,411", "NumericValue": 13411.0 },
+    { "Id": 104, "IndicatorCode": "WHS3_62", "SpatialDimType": "COUNTRY", "SpatialDim": "USA", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "1,282", "NumericValue": 1282.0 },
+    { "Id": 105, "IndicatorCode": "WHS3_62", "SpatialDimType": "COUNTRY", "SpatialDim": "UKR", "TimeDimType": "YEAR", "TimeDim": 2018, "Value": "35,120", "NumericValue": 35120.0 },
+    { "Id": 106, "IndicatorCode": "WHS3_62", "SpatialDimType": "REGION", "SpatialDim": "EUR", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "999,999", "NumericValue": 999999.0 },
+    { "Id": 107, "IndicatorCode": "WHS3_62", "SpatialDimType": "COUNTRY", "SpatialDim": "QQQ", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "42", "NumericValue": 42.0 }
+  ]
+}
