@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
-import { VirusWikiIndexNav } from "@/components/wiki/VirusWikiIndexNav";
-import { getVirusWiki } from "@/data/virus-wiki";
+import { VirusWikiIndexNav, type VirusWikiIndexItem } from "@/components/wiki/VirusWikiIndexNav";
+import { SectionHeader } from "@/components/ui";
+import { getVirusWiki, getVirusWikiFallback } from "@/data/virus-wiki";
 import { env } from "@/lib/config";
-import { getDashboardSnapshot } from "@/server/dashboard-service";
+import { VIRUSES } from "@/lib/viruses";
 
 export const revalidate = 1800;
 
@@ -32,16 +33,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function VirusWikiIndexPage() {
-  const snapshot = await getDashboardSnapshot();
-  const viruses = [...snapshot.viruses].sort((a, b) => a.name.localeCompare(b.name));
+/** Distills a lead paragraph down to its first sentence, for a compact card excerpt. */
+function firstSentence(text: string): string {
+  const trimmed = text.trim();
+  const match = trimmed.match(/^.*?[.!?](?=\s|$)/);
+  return match ? match[0].trim() : trimmed;
+}
 
-  const items = viruses.map((v) => {
-    const wiki = getVirusWiki(v.slug);
+export default async function VirusWikiIndexPage() {
+  // The index lists every pathogen in the canonical registry (VIRUSES), not
+  // just the ones with a live ingested snapshot — most tracked viruses are
+  // curated-only, and their wiki pages are still fully browsable.
+  const viruses = [...VIRUSES].sort((a, b) => a.name.localeCompare(b.name));
+
+  const items: VirusWikiIndexItem[] = viruses.map((v) => {
+    const wiki = getVirusWiki(v.slug) ?? getVirusWikiFallback(v.name, "");
     return {
       slug: v.slug,
       name: v.name,
-      summary: wiki?.lead ?? v.summary,
+      shortName: v.shortName,
+      category: v.category,
+      hasLiveData: v.hasLiveData,
+      lead: firstSentence(wiki.lead),
     };
   });
 
@@ -76,14 +89,12 @@ export default async function VirusWikiIndexPage() {
     <div className="space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
-      <header className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-6">
-        <p className="text-xs uppercase tracking-[0.25em] text-cyan-400">Navigation</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-cyan-50">Virus wiki</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cyan-100/80">
-          Choose a pathogen to open its full wiki: clinical and surveillance context, live regional metrics, trajectory
-          charts, threat visuals, and an embedded global infection heat map. Updated from the same snapshot as the
-          dashboard.
-        </p>
+      <header className="rounded-2xl border border-border-default bg-surface-raised p-6">
+        <SectionHeader
+          eyebrow="Navigation"
+          title="The plain-English virus guide"
+          description="Choose a pathogen to open its full wiki: clinical and surveillance context, live regional metrics where available, trajectory charts, threat visuals, and an embedded global infection heat map. Updated from the same snapshot as the dashboard."
+        />
       </header>
       <VirusWikiIndexNav viruses={items} />
     </div>
