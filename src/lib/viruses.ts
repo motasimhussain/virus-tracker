@@ -22,7 +22,17 @@ export type VirusSlug =
   | "cholera"
   | "mpox"
   | "influenza"
-  | "ebola";
+  | "ebola"
+  | "measles"
+  | "polio"
+  | "yellow-fever"
+  | "west-nile-virus"
+  | "rsv"
+  | "norovirus"
+  | "mers"
+  | "rabies"
+  | "hepatitis-a"
+  | "oropouche";
 
 export type VirusCategory =
   | "respiratory"
@@ -129,7 +139,7 @@ export const VIRUSES: readonly VirusDefinition[] = [
     shortName: "Mpox",
     newsAliases: ["mpox", "monkeypox"],
     category: "zoonotic",
-    hasLiveData: false,
+    hasLiveData: true,
   },
   {
     slug: "influenza",
@@ -137,7 +147,7 @@ export const VIRUSES: readonly VirusDefinition[] = [
     shortName: "Flu",
     newsAliases: ["flu", "influenza", "seasonal flu"],
     category: "respiratory",
-    hasLiveData: false,
+    hasLiveData: true,
   },
   {
     slug: "ebola",
@@ -145,6 +155,86 @@ export const VIRUSES: readonly VirusDefinition[] = [
     shortName: "Ebola",
     newsAliases: ["ebola", "ebola virus disease", "evd"],
     category: "hemorrhagic",
+    hasLiveData: false,
+  },
+  {
+    slug: "measles",
+    name: "Measles",
+    shortName: "Measles",
+    newsAliases: ["measles", "rubeola"],
+    category: "respiratory",
+    hasLiveData: true,
+  },
+  {
+    slug: "polio",
+    name: "Polio",
+    shortName: "Polio",
+    newsAliases: ["polio", "poliovirus", "poliomyelitis"],
+    category: "other",
+    hasLiveData: false,
+  },
+  {
+    slug: "yellow-fever",
+    name: "Yellow Fever",
+    shortName: "Yellow Fever",
+    newsAliases: ["yellow fever", "yellow-fever"],
+    category: "vector-borne",
+    hasLiveData: false,
+  },
+  {
+    slug: "west-nile-virus",
+    name: "West Nile Virus",
+    shortName: "West Nile",
+    newsAliases: ["west nile", "wnv", "west nile virus"],
+    category: "vector-borne",
+    hasLiveData: false,
+  },
+  {
+    slug: "rsv",
+    name: "Respiratory Syncytial Virus",
+    shortName: "RSV",
+    newsAliases: ["rsv", "respiratory syncytial", "respiratory syncytial virus"],
+    category: "respiratory",
+    hasLiveData: false,
+  },
+  {
+    slug: "norovirus",
+    name: "Norovirus",
+    shortName: "Norovirus",
+    newsAliases: ["norovirus", "norwalk virus", "stomach flu"],
+    category: "waterborne",
+    hasLiveData: false,
+  },
+  {
+    slug: "mers",
+    name: "MERS",
+    shortName: "MERS",
+    newsAliases: ["mers", "mers-cov", "middle east respiratory", "middle east respiratory syndrome"],
+    category: "respiratory",
+    hasLiveData: false,
+  },
+  {
+    slug: "rabies",
+    name: "Rabies",
+    shortName: "Rabies",
+    newsAliases: ["rabies", "rabies virus"],
+    category: "zoonotic",
+    hasLiveData: false,
+  },
+  {
+    slug: "hepatitis-a",
+    name: "Hepatitis A",
+    shortName: "Hepatitis A",
+    newsAliases: ["hepatitis a", "hep a", "hav"],
+    category: "waterborne",
+    hasLiveData: false,
+  },
+  {
+    slug: "oropouche",
+    name: "Oropouche",
+    shortName: "Oropouche",
+    newsAliases: ["oropouche", "oropouche fever", "oropouche virus"],
+    category: "vector-borne",
     hasLiveData: false,
   },
 ] as const;
