@@ -1,3 +1,5 @@
+import { isVirusSlug, type VirusSlug } from "@/lib/viruses";
+
 export type VirusWikiSeeAlso = {
   label: string;
   href: string;
@@ -19,7 +21,7 @@ export type VirusWikiContent = {
 const STANDARD_DISCLAIMER =
   "Virus Tracker provides aggregated outbreak monitoring for education and situational awareness. It is not medical advice, a diagnostic service, or a substitute for guidance from qualified health professionals or official public health agencies. Always consult licensed clinicians and authoritative sources for personal health decisions.";
 
-const REGISTRY: Record<string, VirusWikiContent> = {
+const REGISTRY: Record<VirusSlug, VirusWikiContent> = {
   "covid-19": {
     slug: "covid-19",
     lead: "COVID-19 is respiratory disease caused by SARS-CoV-2. Global surveillance tracks cases, severity, and regional pressure to highlight emerging waves and healthcare stress.",
@@ -238,7 +240,7 @@ const REGISTRY: Record<string, VirusWikiContent> = {
 };
 
 export function getVirusWiki(slug: string): VirusWikiContent | null {
-  return REGISTRY[slug] ?? null;
+  return isVirusSlug(slug) ? (REGISTRY[slug] ?? null) : null;
 }
 
 export function getVirusWikiFallback(name: string, summary: string): VirusWikiContent {

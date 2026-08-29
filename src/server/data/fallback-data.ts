@@ -1,6 +1,9 @@
 import type { NewsItem, RegionMetric, TrajectoryPoint } from "@/lib/types";
+import type { VirusSlug } from "@/lib/viruses";
 
-export const fallbackMetrics: RegionMetric[] = [
+type FallbackRegionMetric = RegionMetric & { slug: VirusSlug };
+
+export const fallbackMetrics: FallbackRegionMetric[] = [
   {
     virus: "COVID-19",
     slug: "covid-19",
@@ -393,7 +396,7 @@ export const fallbackTrajectory: Record<string, TrajectoryPoint[]> = {
       confidenceHigh: Math.round(projectedCases * 1.31),
     };
   }),
-};
+} satisfies Record<VirusSlug, TrajectoryPoint[]>;
 
 export const fallbackNews: NewsItem[] = [
   {

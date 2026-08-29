@@ -13,6 +13,7 @@ import { VirusRegionalBarChart } from "@/components/virus/VirusRegionalBarChart"
 import { getVirusWiki, getVirusWikiFallback } from "@/data/virus-wiki";
 import { env } from "@/lib/config";
 import { slugify } from "@/lib/seo";
+import { getVirusDef, isVirusSlug } from "@/lib/viruses";
 import { getDashboardSnapshot, getFilteredDashboardView } from "@/server/dashboard-service";
 
 type VirusDetailsPageProps = {
@@ -23,33 +24,40 @@ export const revalidate = 1800;
 
 export async function generateMetadata({ params }: VirusDetailsPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const snapshot = await getDashboardSnapshot();
-  const virus = snapshot.viruses.find((entry) => entry.slug === slug);
-  if (!virus) {
+  if (!isVirusSlug(slug)) {
     return {
       title: "Virus not found",
       alternates: { canonical: `/viruses/${slug}` },
     };
   }
 
+  const virusDef = getVirusDef(slug);
   const wiki = getVirusWiki(slug);
-  const totalActive = virus.metrics.reduce((sum, metric) => sum + metric.activeCases, 0);
-  const metaDescription = wiki
-    ? `${wiki.lead} Dataset: ${virus.metrics.length} regions, ${totalActive.toLocaleString()} active cases (monitoring snapshot). Updated ${new Date(snapshot.generatedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}.`
-    : `${virus.summary} Tracking ${virus.metrics.length} regions and ${totalActive.toLocaleString()} active cases. Emerging threat wiki and analytics.`;
+  const snapshot = await getDashboardSnapshot();
+  const virus = snapshot.viruses.find((entry) => entry.slug === slug) ?? null;
 
-  const title = `${virus.name} Wiki | Outbreak Intelligence & Heat Map`;
+  const displayName = virus?.name ?? virusDef?.name ?? slug;
+  const totalActive = virus ? virus.metrics.reduce((sum, metric) => sum + metric.activeCases, 0) : 0;
+  const metaDescription = wiki
+    ? virus
+      ? `${wiki.lead} Dataset: ${virus.metrics.length} regions, ${totalActive.toLocaleString()} active cases (monitoring snapshot). Updated ${new Date(snapshot.generatedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}.`
+      : `${wiki.lead} Live regional tracking for ${displayName} is not available yet on Virus Tracker.`
+    : virus
+      ? `${virus.summary} Tracking ${virus.metrics.length} regions and ${totalActive.toLocaleString()} active cases. Emerging threat wiki and analytics.`
+      : `${displayName}: outbreak wiki and surveillance context on Virus Tracker.`;
+
+  const title = `${displayName} Wiki | Outbreak Intelligence & Heat Map`;
 
   return {
     title,
     description: metaDescription,
     alternates: {
-      canonical: `/viruses/${virus.slug}`,
+      canonical: `/viruses/${slug}`,
     },
     openGraph: {
       title,
       description: metaDescription,
-      url: `${env.APP_URL}/viruses/${virus.slug}`,
+      url: `${env.APP_URL}/viruses/${slug}`,
       type: "article",
       siteName: "Virus Tracker",
       locale: "en_US",
@@ -68,16 +76,22 @@ function threatPath(virusSlug: string, region: string, countryCode: string): str
 
 export default async function VirusDetailsPage({ params }: VirusDetailsPageProps) {
   const { slug } = await params;
+  // Existence is gated on the canonical registry/wiki, not on live snapshot data,
+  // so a virus with wiki content but no ingested metrics still renders (see T0.3).
+  if (!isVirusSlug(slug)) return notFound();
+
+  const virusDef = getVirusDef(slug)!;
   const snapshot = await getDashboardSnapshot();
-  const virus = snapshot.viruses.find((entry) => entry.slug === slug);
-  if (!virus) return notFound();
+  const virus = snapshot.viruses.find((entry) => entry.slug === slug) ?? null;
+  const hasLiveMetrics = virus !== null;
 
-  const wiki = getVirusWiki(slug) ?? getVirusWikiFallback(virus.name, virus.summary);
-  const filteredView = getFilteredDashboardView(snapshot, virus.slug, null);
+  const displayName = virus?.name ?? virusDef.name;
+  const wiki = getVirusWiki(slug) ?? getVirusWikiFallback(displayName, virus?.summary ?? "");
+  const filteredView = virus ? getFilteredDashboardView(snapshot, virus.slug, null) : null;
 
-  const totalActive = virus.metrics.reduce((sum, metric) => sum + metric.activeCases, 0);
-  const totalDeaths = virus.metrics.reduce((sum, metric) => sum + metric.deaths, 0);
-  const topRegions = [...virus.metrics].sort((a, b) => b.activeCases - a.activeCases).slice(0, 12);
+  const totalActive = virus ? virus.metrics.reduce((sum, metric) => sum + metric.activeCases, 0) : 0;
+  const totalDeaths = virus ? virus.metrics.reduce((sum, metric) => sum + metric.deaths, 0) : 0;
+  const topRegions = virus ? [...virus.metrics].sort((a, b) => b.activeCases - a.activeCases).slice(0, 12) : [];
   const topRegion = topRegions[0];
 
   const breadcrumbJsonLd = {
@@ -86,7 +100,7 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: env.APP_URL },
       { "@type": "ListItem", position: 2, name: "Viruses", item: `${env.APP_URL}/` },
-      { "@type": "ListItem", position: 3, name: `${virus.name} Wiki`, item: `${env.APP_URL}/viruses/${virus.slug}` },
+      { "@type": "ListItem", position: 3, name: `${displayName} Wiki`, item: `${env.APP_URL}/viruses/${slug}` },
     ],
   };
 
@@ -96,7 +110,7 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: `${virus.name} — outbreak wiki, heat map, and analytics`,
+    headline: `${displayName} — outbreak wiki, heat map, and analytics`,
     description: articleDescription,
     dateModified: snapshot.generatedAt,
     author: {
@@ -111,7 +125,7 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${env.APP_URL}/viruses/${virus.slug}`,
+      "@id": `${env.APP_URL}/viruses/${slug}`,
     },
   };
 
@@ -160,11 +174,17 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
 
       <header className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-5">
         <p className="text-xs uppercase tracking-[0.25em] text-cyan-400">Virus wiki</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-cyan-50">{virus.name}</h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-cyan-50">{displayName}</h1>
         <p className="mt-3 text-sm leading-relaxed text-cyan-100/85">{wiki.lead}</p>
         <p className="mt-2 text-xs text-cyan-200/60">
-          Snapshot: {new Date(snapshot.generatedAt).toLocaleString()} · {virus.metrics.length} tracked locations ·{" "}
-          {totalActive.toLocaleString()} active cases (dataset)
+          {hasLiveMetrics && virus ? (
+            <>
+              Snapshot: {new Date(snapshot.generatedAt).toLocaleString()} · {virus.metrics.length} tracked locations
+              · {totalActive.toLocaleString()} active cases (dataset)
+            </>
+          ) : (
+            <>Live monitoring snapshot: not yet available for this pathogen</>
+          )}
         </p>
       </header>
 
@@ -174,6 +194,13 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
         <p className="font-semibold text-amber-200">Important</p>
         <p className="mt-1">{wiki.disclaimer}</p>
       </section>
+
+      {!hasLiveMetrics && (
+        <section className="rounded-xl border border-cyan-500/25 bg-slate-900/50 p-4 text-sm text-cyan-100/80">
+          Live tracking for this virus isn&apos;t available yet. The wiki content below is still fully available;
+          regional metrics, heat maps, and trajectory charts will appear once live monitoring is enabled.
+        </section>
+      )}
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1 space-y-6">
@@ -216,19 +243,25 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
             <h2 id="wiki-metrics-heading" className="mb-3 text-lg font-semibold text-cyan-100">
               Key metrics
             </h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              <MetricCard label="Active cases (dataset)" value={totalActive.toLocaleString()} />
-              <MetricCard label="Reported deaths" value={totalDeaths.toLocaleString()} />
-              <MetricCard label="Pressure index" value={`${virus.latestGrowthRate}%`} />
-            </div>
+            {hasLiveMetrics && virus ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                <MetricCard label="Active cases (dataset)" value={totalActive.toLocaleString()} />
+                <MetricCard label="Reported deaths" value={totalDeaths.toLocaleString()} />
+                <MetricCard label="Pressure index" value={`${virus.latestGrowthRate}%`} />
+              </div>
+            ) : (
+              <p className="text-sm text-cyan-100/60">Live tracking for this virus isn&apos;t available yet.</p>
+            )}
           </section>
 
-          <WorldHeatMap
-            items={virus.metrics}
-            sectionId="virus-infection-heat-map"
-            title={`${virus.name} — global infection heat map`}
-            description="Country shading reflects relative active-case intensity from the current Virus Tracker dataset for this pathogen. Hover countries on desktop for counts."
-          />
+          {hasLiveMetrics && virus && (
+            <WorldHeatMap
+              items={virus.metrics}
+              sectionId="virus-infection-heat-map"
+              title={`${displayName} — global infection heat map`}
+              description="Country shading reflects relative active-case intensity from the current Virus Tracker dataset for this pathogen. Hover countries on desktop for counts."
+            />
+          )}
 
           <AdSlot placement="in-feed" slotName="Virus wiki — in-feed" className="w-full" />
 
@@ -236,60 +269,76 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
             <h2 id="wiki-trajectory-heading" className="mb-3 text-lg font-semibold text-cyan-100">
               Trajectory outlook
             </h2>
-            <TrajectoryChart points={virus.trajectory} />
+            {hasLiveMetrics && virus ? (
+              <TrajectoryChart points={virus.trajectory} />
+            ) : (
+              <p className="text-sm text-cyan-100/60">Live tracking for this virus isn&apos;t available yet.</p>
+            )}
           </section>
 
           <section aria-labelledby="wiki-regional-heading">
             <h2 id="wiki-regional-heading" className="mb-3 text-lg font-semibold text-cyan-100">
               Regional analysis
             </h2>
-            <VirusRegionalBarChart metrics={virus.metrics} virusName={virus.name} topN={10} />
+            {hasLiveMetrics && virus ? (
+              <VirusRegionalBarChart metrics={virus.metrics} virusName={displayName} topN={10} />
+            ) : (
+              <p className="text-sm text-cyan-100/60">Live tracking for this virus isn&apos;t available yet.</p>
+            )}
           </section>
 
           <section aria-labelledby="wiki-threat-heading">
             <h2 id="wiki-threat-heading" className="mb-3 text-lg font-semibold text-cyan-100">
               Threat intelligence visuals
             </h2>
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="lg:col-span-2">
-                <ThreatMatrixPanel points={filteredView.threatMatrixPoints} />
-              </div>
-              <SourceReliabilityPanel summary={filteredView.sourceReliabilitySummary} />
-            </div>
-            <div className="mt-4">
-              <SeverityByRegionPanel buckets={filteredView.severityByRegion} />
-            </div>
+            {filteredView ? (
+              <>
+                <div className="grid gap-4 lg:grid-cols-3">
+                  <div className="lg:col-span-2">
+                    <ThreatMatrixPanel points={filteredView.threatMatrixPoints} />
+                  </div>
+                  <SourceReliabilityPanel summary={filteredView.sourceReliabilitySummary} />
+                </div>
+                <div className="mt-4">
+                  <SeverityByRegionPanel buckets={filteredView.severityByRegion} />
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-cyan-100/60">Live tracking for this virus isn&apos;t available yet.</p>
+            )}
           </section>
 
-          <section className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-5" aria-labelledby="wiki-top-regions">
-            <h2 id="wiki-top-regions" className="text-lg font-semibold text-cyan-100">
-              Top affected regions
-            </h2>
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[480px] border-collapse text-left text-sm text-cyan-100/85">
-                <thead>
-                  <tr className="border-b border-cyan-500/30 text-xs uppercase tracking-wide text-cyan-400">
-                    <th className="py-2 pr-4 font-medium">Location</th>
-                    <th className="py-2 pr-4 font-medium">Active</th>
-                    <th className="py-2 font-medium">Deaths</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topRegions.map((region) => (
-                    <tr key={`${region.locationId}-${region.slug}`} className="border-b border-cyan-800/40">
-                      <td className="py-2 pr-4">
-                        {region.locationLevel === "admin1" && region.admin1Name
-                          ? `${region.admin1Name}, ${region.countryName}`
-                          : `${region.region} (${region.countryCode})`}
-                      </td>
-                      <td className="py-2 pr-4 font-mono text-xs">{region.activeCases.toLocaleString()}</td>
-                      <td className="py-2 font-mono text-xs">{region.deaths.toLocaleString()}</td>
+          {hasLiveMetrics && (
+            <section className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-5" aria-labelledby="wiki-top-regions">
+              <h2 id="wiki-top-regions" className="text-lg font-semibold text-cyan-100">
+                Top affected regions
+              </h2>
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full min-w-[480px] border-collapse text-left text-sm text-cyan-100/85">
+                  <thead>
+                    <tr className="border-b border-cyan-500/30 text-xs uppercase tracking-wide text-cyan-400">
+                      <th className="py-2 pr-4 font-medium">Location</th>
+                      <th className="py-2 pr-4 font-medium">Active</th>
+                      <th className="py-2 font-medium">Deaths</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                  </thead>
+                  <tbody>
+                    {topRegions.map((region) => (
+                      <tr key={`${region.locationId}-${region.slug}`} className="border-b border-cyan-800/40">
+                        <td className="py-2 pr-4">
+                          {region.locationLevel === "admin1" && region.admin1Name
+                            ? `${region.admin1Name}, ${region.countryName}`
+                            : `${region.region} (${region.countryCode})`}
+                        </td>
+                        <td className="py-2 pr-4 font-mono text-xs">{region.activeCases.toLocaleString()}</td>
+                        <td className="py-2 font-mono text-xs">{region.deaths.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
 
           <section className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-5" aria-labelledby="wiki-faq">
             <h2 id="wiki-faq" className="text-lg font-semibold text-cyan-100">
@@ -317,20 +366,20 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
                 All virus wikis
               </Link>
               <Link
-                href={`/map?virus=${virus.slug}`}
+                href={`/map?virus=${slug}`}
                 className="rounded-md border border-cyan-400/35 px-3 py-1 text-xs text-cyan-200 hover:text-fuchsia-300"
               >
                 Full-screen heat map
               </Link>
               <Link
-                href={`/news/topic/${slugify(virus.name)}`}
+                href={`/news/topic/${slugify(displayName)}`}
                 className="rounded-md border border-cyan-400/35 px-3 py-1 text-xs text-cyan-200 hover:text-fuchsia-300"
               >
-                News topic: {virus.name}
+                News topic: {displayName}
               </Link>
               {topRegion ? (
                 <Link
-                  href={threatPath(virus.slug, topRegion.region, topRegion.countryCode)}
+                  href={threatPath(slug, topRegion.region, topRegion.countryCode)}
                   className="rounded-md border border-cyan-400/35 px-3 py-1 text-xs text-cyan-200 hover:text-fuchsia-300"
                 >
                   Top threat: {topRegion.region}
