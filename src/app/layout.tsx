@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
 import { env } from "@/lib/config";
+import { Header } from "@/components/shell/Header";
+import { Footer } from "@/components/shell/Footer";
+import { MotionProvider } from "@/components/motion";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,25 +83,11 @@ gtag('config', '${env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');`,
         ) : null}
       </head>
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-100">
-        <header className="sticky top-0 z-50 border-b border-cyan-400/20 bg-slate-950/90 backdrop-blur">
-          <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-            <Link href="/" className="text-lg font-bold tracking-[0.25em] text-cyan-300">
-              VIRUS TRACKER
-            </Link>
-            <div className="flex flex-wrap items-center gap-5 text-sm text-cyan-100/80">
-              <Link href="/viruses" className="hover:text-cyan-300">
-                Wiki
-              </Link>
-              <Link href="/map" className="hover:text-cyan-300">
-                Heat Map
-              </Link>
-              <Link href="/news" className="hover:text-cyan-300">
-                News
-              </Link>
-            </div>
-          </nav>
-        </header>
-        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 py-6">{children}</main>
+        <MotionProvider>
+          <Header />
+          <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 py-6">{children}</main>
+          <Footer />
+        </MotionProvider>
       </body>
     </html>
   );
