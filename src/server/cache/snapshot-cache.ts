@@ -1,5 +1,5 @@
-import { env } from "@/lib/config";
 import type { DashboardSnapshot } from "@/lib/types";
+import { getLatestSnapshot, upsertSnapshot } from "@/server/db/supabase";
 
 export type SourceHealthRecord = { source: string; healthy: boolean; message: string };
 
@@ -11,39 +11,14 @@ export type CacheEnvelope = {
 
 const CACHE_KEY = "virus-tracker:snapshot:v1";
 
-async function upstashGet(key: string): Promise<string | null> {
-  if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) return null;
-  const response = await fetch(`${env.UPSTASH_REDIS_REST_URL}/get/${encodeURIComponent(key)}`, {
-    headers: {
-      Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN}`,
-    },
-    cache: "no-store",
-  });
-  if (!response.ok) return null;
-  const payload = (await response.json()) as { result?: string | null };
-  return payload.result ?? null;
-}
-
-async function upstashSet(key: string, value: string, ttlSeconds: number): Promise<void> {
-  if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) return;
-  await fetch(
-    `${env.UPSTASH_REDIS_REST_URL}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}?EX=${ttlSeconds}`,
-    {
-      headers: {
-        Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN}`,
-      },
-      cache: "no-store",
-    },
-  );
-}
+// L2 shared cache, backed by Supabase (see src/server/db/supabase.ts). Every
+// call there already no-ops/returns null when Supabase env vars are absent
+// and never throws, so these wrappers stay simple pass-throughs; the
+// try/catch here is defense-in-depth against unexpected rejections.
 
 export async function getSnapshotFromSharedCache(): Promise<CacheEnvelope | null> {
   try {
-    const raw = await upstashGet(CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as CacheEnvelope;
-    if (!parsed?.snapshot || !parsed?.generatedAtMs) return null;
-    return parsed;
+    return await getLatestSnapshot(CACHE_KEY);
   } catch {
     return null;
   }
@@ -51,7 +26,7 @@ export async function getSnapshotFromSharedCache(): Promise<CacheEnvelope | null
 
 export async function setSnapshotToSharedCache(payload: CacheEnvelope): Promise<void> {
   try {
-    await upstashSet(CACHE_KEY, JSON.stringify(payload), env.INGESTION_TTL_SECONDS + env.REVALIDATE_SECONDS);
+    await upsertSnapshot(CACHE_KEY, payload);
   } catch {
     // Best-effort write. In-memory cache continues to function if shared cache fails.
   }
