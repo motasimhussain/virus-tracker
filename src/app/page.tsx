@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { AdSlot } from "@/components/ads/AdSlot";
 import { HeatList } from "@/components/dashboard/HeatList";
-import { MetricCard } from "@/components/dashboard/MetricCard";
+import { HeroStatus } from "@/components/dashboard/HeroStatus";
 import { NewsFeed } from "@/components/dashboard/NewsFeed";
 import { SeverityByRegionPanel } from "@/components/dashboard/SeverityByRegionPanel";
 import { SourceReliabilityPanel } from "@/components/dashboard/SourceReliabilityPanel";
@@ -11,7 +10,10 @@ import { TopThreatCards } from "@/components/dashboard/TopThreatCards";
 import { ThreatMatrixPanel } from "@/components/dashboard/ThreatMatrixPanel";
 import { ThreatFilters } from "@/components/dashboard/ThreatFilters";
 import { TrajectoryChart } from "@/components/dashboard/TrajectoryChart";
+import { AnimatedNumber, Reveal } from "@/components/motion";
+import { Button, InfoTip, SectionHeader, StatCard } from "@/components/ui";
 import { env } from "@/lib/config";
+import { METRIC_COPY } from "@/lib/copy";
 import { slugify } from "@/lib/seo";
 import { getDashboardSnapshot, getFilteredDashboardView } from "@/server/dashboard-service";
 
@@ -46,6 +48,12 @@ export default async function Home({ searchParams }: HomePageProps) {
   const totalActive = filteredView.filteredHotspots.reduce((sum, item) => sum + item.activeCases, 0);
   const totalDeaths = filteredView.filteredHotspots.reduce((sum, item) => sum + item.deaths, 0);
   const leadVirus = filteredView.leadVirus;
+
+  // Hero stats reflect the full, unfiltered snapshot — the filtered metrics
+  // below respond to the virus/threat query params instead.
+  const countryCount = new Set(snapshot.hotspots.map((item) => item.countryCode)).size;
+  const snapshotActiveTotal = snapshot.hotspots.reduce((sum, item) => sum + item.activeCases, 0);
+
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -66,89 +74,189 @@ export default async function Home({ searchParams }: HomePageProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <section className="rounded-2xl border border-cyan-400/20 bg-[radial-gradient(circle_at_top,_rgba(14,116,144,0.2),_rgba(2,6,23,1))] p-6">
-        <p className="text-xs uppercase tracking-[0.25em] text-cyan-300">Global Outbreak Intelligence</p>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight text-cyan-50">Virus Tracker Command Center</h1>
-            <p className="mt-2 text-sm text-cyan-100/80">
-              Realtime disease monitoring, spread analysis, and forecast trajectory signals.
-            </p>
-          </div>
-          <Link href="/map" className="rounded-lg border border-cyan-300/40 px-4 py-2 text-sm text-cyan-200 hover:text-fuchsia-300">
-            Open Heat Map
-          </Link>
+
+      <HeroStatus
+        virusCount={snapshot.viruses.length}
+        countryCount={countryCount}
+        activeTotal={snapshotActiveTotal}
+        generatedAt={snapshot.generatedAt}
+      />
+
+      <Reveal as="section" className="space-y-4">
+        <SectionHeader
+          eyebrow="Snapshot"
+          title="Today's numbers"
+          description="A quick read on how big this outbreak picture is right now, for your current filter."
+        />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label={METRIC_COPY.trackedViruses.label}
+            infoTip={<InfoTip label="What does tracked viruses mean?">{METRIC_COPY.trackedViruses.explainer}</InfoTip>}
+            hint={METRIC_COPY.trackedViruses.plain(snapshot.viruses.length)}
+          >
+            <AnimatedNumber value={snapshot.viruses.length} className="tabular-nums" />
+          </StatCard>
+          <StatCard
+            label={METRIC_COPY.activeCases.label}
+            infoTip={<InfoTip label="What does active cases mean?">{METRIC_COPY.activeCases.explainer}</InfoTip>}
+            hint={METRIC_COPY.activeCases.plain(totalActive)}
+          >
+            <AnimatedNumber value={totalActive} format="compact" className="tabular-nums" />
+          </StatCard>
+          <StatCard
+            label={METRIC_COPY.deaths.label}
+            infoTip={<InfoTip label="What does deaths mean?">{METRIC_COPY.deaths.explainer}</InfoTip>}
+            hint={METRIC_COPY.deaths.plain(totalDeaths)}
+          >
+            <AnimatedNumber value={totalDeaths} format="compact" className="tabular-nums" />
+          </StatCard>
+          <StatCard
+            label="Top threat right now"
+            infoTip={<InfoTip label="How is the top threat picked?">{METRIC_COPY.growthRate.explainer}</InfoTip>}
+            hint={leadVirus ? METRIC_COPY.growthRate.plain(leadVirus.latestGrowthRate) : "No data available yet."}
+          >
+            {leadVirus?.name ?? "N/A"}
+          </StatCard>
         </div>
-      </section>
+      </Reveal>
 
-      <section className="grid gap-4 md:grid-cols-4">
-        <MetricCard label="Tracked Viruses" value={String(snapshot.viruses.length)} hint={`Updated ${new Date(snapshot.generatedAt).toLocaleTimeString()}`} />
-        <MetricCard label="Active Cases (Filtered)" value={totalActive.toLocaleString()} />
-        <MetricCard label="Reported Deaths (Filtered)" value={totalDeaths.toLocaleString()} />
-        <MetricCard label="Lead Threat" value={leadVirus?.name ?? "N/A"} hint={`${leadVirus?.latestGrowthRate ?? 0}% pressure index`} />
-      </section>
+      <Reveal as="section" delay={0.05} className="space-y-4">
+        <SectionHeader
+          title="Where attention is needed most"
+          description="The hotspots combining the highest case counts with the fastest growth, worth a closer look first."
+        />
+        <TopThreatCards threats={filteredView.topThreats} maxCards={6} />
+      </Reveal>
 
-      <TopThreatCards threats={filteredView.topThreats} maxCards={6} />
-
-      <section className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4">
-        <h3 className="text-sm uppercase tracking-[0.2em] text-cyan-300">Threat Landing Pages</h3>
-        <div className="mt-3 flex flex-wrap gap-2">
+      <Reveal as="section" delay={0.1} className="space-y-4">
+        <SectionHeader
+          title="Jump to a threat"
+          description="Pick a hotspot below to see its full profile — cases, trend, and sources, in one place."
+        />
+        <div className="flex flex-wrap gap-2">
           {filteredView.topThreats.slice(0, 6).map((threat) => (
-            <Link
+            <Button
               key={`landing-${threat.key}`}
               href={`/threats/${threat.virusSlug}/${slugify(`${threat.region}-${threat.countryCode}`)}`}
-              className="rounded-md border border-cyan-400/35 px-2 py-1 text-xs text-cyan-200 hover:text-fuchsia-300"
+              variant="outline"
+              size="sm"
             >
               {threat.label}
-            </Link>
+            </Button>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       <AdSlot placement="top-banner" slotName="Top Banner 970x90" className="w-full" />
 
-      <ThreatFilters
-        virusOptions={filteredView.virusOptions}
-        topThreats={filteredView.topThreats}
-        selectedVirusSlug={filteredView.selectedVirusSlug}
-        selectedThreatKey={filteredView.selectedThreatKey}
-      />
-
-      <section className="grid gap-4 md:grid-cols-5">
-        <MetricCard label="CFR" value={`${filteredView.threatMetricsSummary.caseFatalityRatio.toFixed(2)}%`} />
-        <MetricCard label="Pressure" value={filteredView.threatMetricsSummary.pressureIndex.toFixed(4)} />
-        <MetricCard label="Recovery" value={`${filteredView.threatMetricsSummary.recoveryRatio.toFixed(2)}%`} />
-        <MetricCard
-          label="Confidence Exposure"
-          value={filteredView.threatMetricsSummary.confidenceAdjustedExposure.toLocaleString()}
+      <Reveal as="section" delay={0.15} className="space-y-4">
+        <SectionHeader
+          title="Filter the dashboard"
+          description="Narrow every chart below to a single virus or hotspot."
         />
-        <MetricCard label="Stale Zones" value={filteredView.threatMetricsSummary.staleDataZones.toString()} />
-      </section>
+        <ThreatFilters
+          virusOptions={filteredView.virusOptions}
+          topThreats={filteredView.topThreats}
+          selectedVirusSlug={filteredView.selectedVirusSlug}
+          selectedThreatKey={filteredView.selectedThreatKey}
+        />
+      </Reveal>
 
-      <section className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ThreatMatrixPanel points={filteredView.threatMatrixPoints} />
+      <Reveal as="section" delay={0.2} className="space-y-4">
+        <SectionHeader
+          title="How this threat is behaving"
+          description="Severity, spread, and how much we trust the numbers, for your current filter."
+        />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <StatCard
+            label={METRIC_COPY.cfr.label}
+            infoTip={<InfoTip label="What does how deadly mean?">{METRIC_COPY.cfr.explainer}</InfoTip>}
+            hint={METRIC_COPY.cfr.plain(filteredView.threatMetricsSummary.caseFatalityRatio)}
+          >
+            {filteredView.threatMetricsSummary.caseFatalityRatio.toFixed(2)}%
+          </StatCard>
+          <StatCard
+            label={METRIC_COPY.pressure.label}
+            infoTip={<InfoTip label="What does outbreak activity mean?">{METRIC_COPY.pressure.explainer}</InfoTip>}
+            hint={METRIC_COPY.pressure.plain(filteredView.threatMetricsSummary.pressureIndex)}
+          >
+            {filteredView.threatMetricsSummary.pressureIndex.toFixed(4)}
+          </StatCard>
+          <StatCard
+            label={METRIC_COPY.recoveryRatio.label}
+            infoTip={<InfoTip label="What does recovery rate mean?">{METRIC_COPY.recoveryRatio.explainer}</InfoTip>}
+            hint={METRIC_COPY.recoveryRatio.plain(filteredView.threatMetricsSummary.recoveryRatio)}
+          >
+            {filteredView.threatMetricsSummary.recoveryRatio.toFixed(2)}%
+          </StatCard>
+          <StatCard
+            label={METRIC_COPY.confidence.label}
+            infoTip={<InfoTip label="What does data reliability mean?">{METRIC_COPY.confidence.explainer}</InfoTip>}
+            hint={`${METRIC_COPY.confidence.technical}: ${filteredView.threatMetricsSummary.confidenceAdjustedExposure.toLocaleString()}`}
+          >
+            <AnimatedNumber
+              value={filteredView.threatMetricsSummary.confidenceAdjustedExposure}
+              format="compact"
+              className="tabular-nums"
+            />
+          </StatCard>
+          <StatCard
+            label={METRIC_COPY.staleness.label}
+            infoTip={<InfoTip label="What does outdated data areas mean?">{METRIC_COPY.staleness.explainer}</InfoTip>}
+            hint={METRIC_COPY.staleness.plain(filteredView.threatMetricsSummary.staleDataZones)}
+          >
+            {filteredView.threatMetricsSummary.staleDataZones}
+          </StatCard>
         </div>
-        <SourceReliabilityPanel summary={filteredView.sourceReliabilitySummary} />
-      </section>
+      </Reveal>
 
-      <SeverityByRegionPanel buckets={filteredView.severityByRegion} />
-
-      <section className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <TrajectoryChart points={leadVirus?.trajectory ?? []} />
+      <Reveal as="section" delay={0.25} className="space-y-4">
+        <SectionHeader
+          title="Severity vs. confidence"
+          description="How dangerous each hotspot looks, plotted against how much we trust the data behind it."
+        />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <ThreatMatrixPanel points={filteredView.threatMatrixPoints} />
+          </div>
+          <SourceReliabilityPanel summary={filteredView.sourceReliabilitySummary} />
         </div>
-        <HeatList items={filteredView.filteredHotspots.slice(0, 20)} />
-      </section>
+      </Reveal>
 
-      <section className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <NewsFeed items={snapshot.news.slice(0, 20)} />
-        <div className="space-y-4">
-          <AdSlot placement="sidebar" slotName="Sidebar Rail 300x600" />
-          <AdSlot placement="in-feed" slotName="In-Feed 336x280" />
+      <Reveal as="section" delay={0.3} className="space-y-4">
+        <SectionHeader
+          title="Severity by region"
+          description="Which regions carry the heaviest overall threat level right now."
+        />
+        <SeverityByRegionPanel buckets={filteredView.severityByRegion} />
+      </Reveal>
+
+      <Reveal as="section" delay={0.35} className="space-y-4">
+        <SectionHeader
+          title="Trajectory and hotspots"
+          description="Where the leading threat is headed next, and the places seeing the most active cases today."
+        />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <TrajectoryChart points={leadVirus?.trajectory ?? []} />
+          </div>
+          <HeatList items={filteredView.filteredHotspots.slice(0, 20)} />
+        </div>
+      </Reveal>
+
+      <section className="space-y-4">
+        <SectionHeader title="Latest news" description="Recent coverage from public health sources, as it comes in." />
+        <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+          <Reveal delay={0.4}>
+            <NewsFeed items={snapshot.news.slice(0, 20)} />
+          </Reveal>
+          <div className="space-y-4">
+            <AdSlot placement="sidebar" slotName="Sidebar Rail 300x600" />
+            <AdSlot placement="in-feed" slotName="In-Feed 336x280" />
+          </div>
         </div>
       </section>
     </div>
