@@ -8,11 +8,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const snapshot = await getDashboardSnapshot();
   const now = new Date();
 
-  const staticRoutes: MetadataRoute.Sitemap = ["", "/map", "/news", "/viruses"].map((path) => ({
+  const staticRoutes: MetadataRoute.Sitemap = ["", "/map", "/news", "/viruses", "/about-data"].map((path) => ({
     url: `${env.APP_URL}${path}`,
     lastModified: now,
     changeFrequency: "hourly",
-    priority: path === "" ? 1 : path === "/viruses" ? 0.92 : 0.85,
+    priority: path === "" ? 1 : path === "/viruses" ? 0.92 : path === "/about-data" ? 0.6 : 0.85,
   }));
 
   const virusRoutes: MetadataRoute.Sitemap = snapshot.viruses.map((virus) => ({
