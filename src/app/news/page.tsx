@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 
 import Link from "next/link";
+import { Newspaper } from "lucide-react";
 
-import { NewsFeed } from "@/components/dashboard/NewsFeed";
+import { Reveal } from "@/components/motion";
+import { NewsCard } from "@/components/news/NewsCard";
+import { NewsFilters } from "@/components/news/NewsFilters";
+import { Badge, EmptyState, SectionHeader } from "@/components/ui";
 import { env } from "@/lib/config";
 import { slugify } from "@/lib/seo";
 import { getDashboardSnapshot } from "@/server/dashboard-service";
@@ -20,8 +24,9 @@ export const metadata: Metadata = {
 
 export default async function NewsPage() {
   const snapshot = await getDashboardSnapshot();
-  const topTags = Array.from(new Set(snapshot.news.flatMap((item) => item.virusTags))).slice(0, 12);
-  const topSources = Array.from(new Set(snapshot.news.map((item) => item.source))).slice(0, 12);
+  const items = snapshot.news;
+  const topSources = Array.from(new Set(items.map((item) => item.source))).slice(0, 14);
+
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -29,36 +34,51 @@ export default async function NewsPage() {
     description: "Curated emerging threat news from trusted global feeds.",
     url: `${env.APP_URL}/news`,
   };
+
   return (
     <div className="space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
-      <section className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-5">
-        <h1 className="text-2xl font-bold text-cyan-100">Outbreak News Stream</h1>
-        <p className="mt-2 text-sm text-cyan-100/70">Aggregated from public RSS and open intelligence sources.</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {topTags.map((tag) => (
-            <Link
-              key={tag}
-              href={`/news/topic/${slugify(tag)}`}
-              className="rounded-md border border-cyan-400/35 px-2 py-1 text-xs text-cyan-200 hover:text-fuchsia-300"
-            >
-              {tag}
-            </Link>
+
+      <SectionHeader
+        eyebrow="Live feed"
+        title="Outbreak news, all in one stream"
+        description="Headlines are aggregated from WHO, ReliefWeb, and other public health and open intelligence sources, then tagged by pathogen so you can filter to what matters."
+      />
+
+      <NewsFilters />
+
+      {items.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {items.map((item, index) => (
+            <Reveal key={item.id} delay={Math.min(index, 8) * 0.04}>
+              <NewsCard item={item} />
+            </Reveal>
           ))}
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {topSources.map((source) => (
-            <Link
-              key={source}
-              href={`/news/source/${slugify(source)}`}
-              className="rounded-md border border-cyan-400/35 px-2 py-1 text-xs text-cyan-200 hover:text-fuchsia-300"
-            >
-              {source}
-            </Link>
-          ))}
-        </div>
-      </section>
-      <NewsFeed items={snapshot.news} />
+      ) : (
+        <EmptyState
+          icon={<Newspaper className="size-5" aria-hidden="true" />}
+          title="No news available"
+          message="We couldn't load any stories from our sources right now. Check back shortly."
+        />
+      )}
+
+      {topSources.length > 0 ? (
+        <section aria-labelledby="news-sources-heading" className="space-y-3">
+          <h2 id="news-sources-heading" className="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">
+            Browse by source
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {topSources.map((source) => (
+              <Link key={source} href={`/news/source/${slugify(source)}`}>
+                <Badge variant="outline" className="transition-colors hover:border-border-accent hover:text-accent">
+                  {source}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
