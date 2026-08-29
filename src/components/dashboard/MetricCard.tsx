@@ -1,15 +1,24 @@
-type MetricCardProps = {
+import { StatCard } from "@/components/ui/StatCard";
+
+export type MetricCardProps = {
+  /** Plain-English label, e.g. "Active cases" — prefer METRIC_COPY labels over technical names. */
   label: string;
+  /** Pre-formatted display value, e.g. "1.2M" or "N/A". */
   value: string;
+  /** Optional supporting line under the value. */
   hint?: string;
 };
 
+/**
+ * KPI tile used across the dashboard and virus pages. Thin wrapper around
+ * `ui/StatCard` — kept as its own component so callers have a stable,
+ * string-in/string-out API without needing to know about StatCard's
+ * children-as-content convention.
+ */
 export function MetricCard({ label, value, hint }: MetricCardProps) {
   return (
-    <div className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4 shadow-[0_0_20px_rgba(34,211,238,0.12)]">
-      <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">{label}</p>
-      <p className="mt-2 text-2xl font-bold text-cyan-50">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-cyan-100/70">{hint}</p> : null}
-    </div>
+    <StatCard label={label} hint={hint}>
+      {value}
+    </StatCard>
   );
 }
