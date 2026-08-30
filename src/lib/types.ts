@@ -18,6 +18,12 @@ export type RegionMetric = {
   deaths: number;
   recovered: number;
   updatedAt: string;
+  newCases7d?: number;
+  incidencePer100k?: number;
+  hospitalized?: number;
+  trend?: Trend;
+  /** ISO date or year the figure refers to (e.g. "2024-06-01" or "2023"). */
+  asOf?: string;
 };
 
 export type NewsItem = {
@@ -35,6 +41,7 @@ export type TrajectoryPoint = {
   projectedCases: number;
   confidenceLow: number;
   confidenceHigh: number;
+  isSynthetic?: boolean;
 };
 
 export type VirusSnapshot = {
@@ -44,6 +51,7 @@ export type VirusSnapshot = {
   metrics: RegionMetric[];
   trajectory: TrajectoryPoint[];
   latestGrowthRate: number;
+  coverage?: Coverage;
 };
 
 export type DashboardSnapshot = {
@@ -51,7 +59,11 @@ export type DashboardSnapshot = {
   viruses: VirusSnapshot[];
   hotspots: RegionMetric[];
   news: NewsItem[];
+  dataFreshness?: { lastRunAt: string; healthySources: number; totalSources: number };
 };
+
+export type Trend = "rising" | "stable" | "falling";
+export type Coverage = "live" | "periodic" | "curated";
 
 export type TopThreat = {
   key: string;

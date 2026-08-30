@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { ThreatFilters } from "@/components/dashboard/ThreatFilters";
-import { HeatList } from "@/components/dashboard/HeatList";
 import { WorldHeatMap } from "@/components/map/WorldHeatMap";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { RiskBar } from "@/components/ui/RiskBar";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { TrendPill } from "@/components/ui/TrendPill";
 import { env } from "@/lib/config";
+import { formatCompactNumber } from "@/lib/copy";
+import { getRiskLevel } from "@/lib/map-scale";
 import { getDashboardSnapshot, getFilteredDashboardView } from "@/server/dashboard-service";
 
 export const revalidate = 1800;
@@ -48,15 +55,18 @@ export default async function MapPage({ searchParams }: MapPageProps) {
     variableMeasured: ["activeCases", "deaths", "recovered", "sourceConfidence", "locationLevel"],
   };
 
+  const hotspots = filteredView.filteredHotspots;
+  const maxActiveCases = hotspots.length > 0 ? Math.max(...hotspots.map((item) => item.activeCases), 0) : 0;
+
   return (
     <div className="space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
-      <section className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-5">
-        <h1 className="text-2xl font-bold text-cyan-100">Global Heat Map</h1>
-        <p className="mt-2 text-sm text-cyan-100/70">
-          Region intensity derived from active case density across a world SVG heat surface.
-        </p>
-      </section>
+
+      <SectionHeader
+        eyebrow="Live data"
+        title="Global heat map"
+        description="See where people are currently sick around the world. Darker countries have more active cases — hover or tap any country for the numbers, or click through for a full regional breakdown."
+      />
 
       <ThreatFilters
         virusOptions={filteredView.virusOptions}
@@ -65,28 +75,59 @@ export default async function MapPage({ searchParams }: MapPageProps) {
         selectedThreatKey={filteredView.selectedThreatKey}
       />
 
-      <WorldHeatMap items={filteredView.filteredHotspots} />
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <HeatList items={filteredView.filteredHotspots} />
-        <div className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4">
-          <h3 className="text-sm uppercase tracking-[0.2em] text-cyan-300">Coordinates Feed</h3>
-          <div className="mt-4 max-h-[480px] space-y-2 overflow-auto text-sm">
-            {filteredView.filteredHotspots.map((item) => (
-              <div key={`${item.slug}-${item.countryCode}-${item.region}`} className="flex justify-between border-b border-cyan-700/20 py-2 text-cyan-100/80">
-                <span>
-                  {item.locationLevel === "admin1" && item.admin1Name
-                    ? `${item.admin1Name}, ${item.countryName}`
-                    : `${item.region} (${item.countryCode})`}
-                </span>
-                <span className="font-mono text-xs">
-                  {item.latitude.toFixed(2)}, {item.longitude.toFixed(2)}
-                </span>
-              </div>
-            ))}
-          </div>
+      {/* Full-bleed breakout so the map centerpiece renders larger than the page's max-w-7xl gutter. */}
+      <div className="relative left-1/2 w-screen -translate-x-1/2 px-6">
+        <div className="mx-auto max-w-[1600px]">
+          <WorldHeatMap items={hotspots} />
         </div>
       </div>
+
+      <SectionHeader title="Hotspot feed" description="Every tracked location behind the map above, ranked by active cases." />
+
+      {hotspots.length === 0 ? (
+        <EmptyState
+          title="No hotspots match these filters"
+          message="Try a different virus or threat filter to see tracked locations here."
+          actionLabel="Clear filters"
+          actionHref="/map"
+        />
+      ) : (
+        <div className="space-y-2">
+          {hotspots.map((item) => {
+            const label =
+              item.locationLevel === "admin1" && item.admin1Name
+                ? `${item.admin1Name}, ${item.countryName}`
+                : `${item.region} (${item.countryCode})`;
+            const riskLevel = getRiskLevel(item.activeCases, maxActiveCases);
+
+            return (
+              <Card key={`${item.slug}-${item.countryCode}-${item.region}`} padding="sm" className="flex flex-wrap items-center gap-4">
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/regions/${item.countryCode.toLowerCase()}`}
+                    className="text-sm font-semibold text-text-primary hover:text-accent"
+                  >
+                    {label}
+                  </Link>
+                  <p className="mt-0.5 text-xs text-text-muted">
+                    {item.virus} · {formatCompactNumber(item.activeCases)} people currently sick
+                  </p>
+                </div>
+
+                <div className="w-32 shrink-0">
+                  <RiskBar value={item.activeCases} max={maxActiveCases} riskLevel={riskLevel} label={`${label} outbreak intensity`} />
+                </div>
+
+                {item.trend ? <TrendPill trend={item.trend} /> : null}
+
+                <span className="shrink-0 font-mono text-xs text-text-faint">
+                  {item.latitude.toFixed(2)}, {item.longitude.toFixed(2)}
+                </span>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

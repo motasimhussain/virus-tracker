@@ -1,68 +1,36 @@
 import type { TrajectoryPoint } from "@/lib/types";
+import { Card } from "@/components/ui/Card";
+import { TrajectoryLineChart } from "@/components/charts/TrajectoryLineChart";
+import { formatShortDateTick } from "@/components/charts/format";
 
-type TrajectoryChartProps = {
+export type TrajectoryChartProps = {
   points: TrajectoryPoint[];
+  /** Optional virus name used in the chart title and its plain-English summary. Defaults to "this virus". */
+  virusName?: string;
 };
 
-export function TrajectoryChart({ points }: TrajectoryChartProps) {
-  if (points.length === 0) {
-    return (
-      <div className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4">
-        <h3 className="text-sm uppercase tracking-[0.2em] text-cyan-300">Trajectory (14d)</h3>
-        <p className="mt-4 text-sm text-cyan-100/70">No trajectory data available.</p>
-      </div>
-    );
-  }
-
-  const max = Math.max(...points.map((point) => point.confidenceHigh), 1);
-  const width = 900;
-  const height = 220;
-  const padding = 24;
-  const innerWidth = width - padding * 2;
-  const innerHeight = height - padding * 2;
-
-  const toX = (index: number) =>
-    points.length <= 1 ? padding : padding + (index / (points.length - 1)) * innerWidth;
-  const toY = (value: number) => padding + innerHeight - (value / max) * innerHeight;
-
-  const linePath = points
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${toX(index)} ${toY(point.projectedCases)}`)
-    .join(" ");
-
-  const bandPath = [
-    ...points.map((point, index) => `${index === 0 ? "M" : "L"} ${toX(index)} ${toY(point.confidenceHigh)}`),
-    ...[...points]
-      .reverse()
-      .map((point, reverseIndex) => {
-        const index = points.length - 1 - reverseIndex;
-        return `L ${toX(index)} ${toY(point.confidenceLow)}`;
-      }),
-    "Z",
-  ].join(" ");
+/**
+ * Case-trajectory panel. Wraps the shared `charts/TrajectoryLineChart` (which
+ * already renders the confidence band and the "Illustrative estimate" badge
+ * for synthetic leading points) with a plain-English header inside the card.
+ */
+export function TrajectoryChart({ points, virusName = "this virus" }: TrajectoryChartProps) {
+  const plainSummary =
+    points.length > 0
+      ? `Projected case trajectory for ${virusName} from ${formatShortDateTick(points[0]!.date)} to ${formatShortDateTick(points[points.length - 1]!.date)}, with a shaded range showing the uncertainty.`
+      : `No projected case trajectory is available for ${virusName} right now.`;
 
   return (
-    <div className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4">
-      <h3 className="text-sm uppercase tracking-[0.2em] text-cyan-300">Trajectory (14d)</h3>
-      <div className="mt-4">
-        <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full">
-          <path d={bandPath} fill="rgba(34,211,238,0.15)" stroke="none" />
-          <path d={linePath} fill="none" stroke="rgba(217,70,239,0.9)" strokeWidth="3" />
-          {points.map((point, index) => (
-            <circle
-              key={point.date}
-              cx={toX(index)}
-              cy={toY(point.projectedCases)}
-              r="3"
-              fill="rgba(103,232,249,0.95)"
-            />
-          ))}
-        </svg>
+    <Card className="flex flex-col gap-4">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Outlook</p>
+        <h3 className="mt-1 text-lg font-bold text-text-primary">Where cases could be headed</h3>
+        <p className="mt-1 text-sm text-text-secondary">
+          A projected trend for {virusName}, based on recent reporting. The shaded band shows how uncertain that
+          projection is.
+        </p>
       </div>
-      <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-cyan-100/75">
-        <span>Projected trend</span>
-        <span>Confidence band</span>
-        <span>{points[0]?.date} to {points[points.length - 1]?.date}</span>
-      </div>
-    </div>
+      <TrajectoryLineChart points={points} virusName={virusName} plainSummary={plainSummary} />
+    </Card>
   );
 }

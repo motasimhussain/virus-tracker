@@ -1,32 +1,55 @@
 import type { SeverityRegionBucket } from "@/lib/types";
+import { Card } from "@/components/ui/Card";
+import { RiskBar } from "@/components/ui/RiskBar";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { METRIC_COPY, formatCompactNumber } from "@/lib/copy";
+import { getRiskLevel } from "@/lib/map-scale";
 
-type SeverityByRegionPanelProps = {
+export type SeverityByRegionPanelProps = {
   buckets: SeverityRegionBucket[];
+  /** Optional plain-English panel title override. */
+  title?: string;
 };
 
-export function SeverityByRegionPanel({ buckets }: SeverityByRegionPanelProps) {
+/**
+ * Ranks regions by overall threat level using risk-ramp fill bars, so the
+ * darkest/reddest bar is the region under the most strain.
+ */
+export function SeverityByRegionPanel({ buckets, title = "Where it's hitting hardest" }: SeverityByRegionPanelProps) {
   const top = buckets.slice(0, 8);
+
+  if (top.length === 0) {
+    return (
+      <Card>
+        <EmptyState title="No regions yet" message="There's no severity data to rank right now." />
+      </Card>
+    );
+  }
+
   const maxScore = Math.max(...top.map((item) => item.severityScore), 1);
 
   return (
-    <div className="rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4">
-      <h3 className="text-sm uppercase tracking-[0.2em] text-cyan-300">Severity by Region</h3>
-      <div className="mt-4 space-y-3">
-        {top.map((item) => (
-          <div key={item.key}>
-            <div className="mb-1 flex items-center justify-between text-xs text-cyan-100/75">
-              <span>{item.label}</span>
-              <span>score {item.severityScore.toFixed(1)}</span>
-            </div>
-            <div className="h-2 w-full rounded bg-slate-800">
-              <div
-                className="h-2 rounded bg-gradient-to-r from-cyan-500 to-fuchsia-500"
-                style={{ width: `${Math.max(8, (item.severityScore / maxScore) * 100)}%` }}
-              />
-            </div>
-          </div>
-        ))}
+    <Card className="flex flex-col gap-4">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">{METRIC_COPY.severityScore.label}</p>
+        <h3 className="mt-1 text-lg font-bold text-text-primary">{title}</h3>
       </div>
-    </div>
+      <ul className="space-y-4">
+        {top.map((item) => {
+          const level = getRiskLevel(item.severityScore, maxScore);
+          return (
+            <li key={item.key}>
+              <div className="mb-1.5 flex items-center justify-between gap-2 text-sm">
+                <span className="font-medium text-text-secondary">{item.label}</span>
+                <span className="text-xs text-text-muted">
+                  {formatCompactNumber(item.totalActiveCases)} active &middot; score {item.severityScore.toFixed(1)}
+                </span>
+              </div>
+              <RiskBar value={item.severityScore} max={maxScore} riskLevel={level} label={`Threat level in ${item.label}`} />
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
   );
 }

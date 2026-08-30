@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { env } from "@/lib/config";
+import { clientEnv as env } from "@/lib/env-client";
 
 export type AdPlacement = "top-banner" | "sidebar" | "in-feed";
 

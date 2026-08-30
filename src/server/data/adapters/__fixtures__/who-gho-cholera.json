@@ -1,0 +1,13 @@
+{
+  "@odata.context": "https://ghoapi.azureedge.net/api/$metadata#CHOLERA_0000000001",
+  "value": [
+    { "Id": 1, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "YEM", "TimeDimType": "YEAR", "TimeDim": 2018, "Value": "1,310,659", "NumericValue": 1310659.0 },
+    { "Id": 2, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "YEM", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "92,003", "NumericValue": 92003.0 },
+    { "Id": 3, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "COD", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "26,887", "NumericValue": 26887.0 },
+    { "Id": 4, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "NGA", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "2,486", "NumericValue": 2486.0 },
+    { "Id": 5, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "SOM", "TimeDimType": "YEAR", "TimeDim": 2017, "Value": "78,784", "NumericValue": 78784.0 },
+    { "Id": 6, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "SOM", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "1,928", "NumericValue": 1928.0 },
+    { "Id": 7, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "REGION", "SpatialDim": "AFR", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "999,999", "NumericValue": 999999.0 },
+    { "Id": 8, "IndicatorCode": "CHOLERA_0000000001", "SpatialDimType": "COUNTRY", "SpatialDim": "XYZ", "TimeDimType": "YEAR", "TimeDim": 2019, "Value": "500", "NumericValue": 500.0 }
+  ]
+}

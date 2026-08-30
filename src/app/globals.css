@@ -1,5 +1,65 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Virus Tracker — "Mission Control" design tokens
+   ==========================================================================
+   Every token below is exposed as a Tailwind v4 utility via @theme (this file
+   IS the Tailwind config — there is no tailwind.config.js). Use these tokens
+   instead of ad-hoc slate/cyan/etc utilities so the theme stays coherent.
+   Each --color-* token below is usable as bg-<name>, text-<name>,
+   border-<name>, ring-<name>, fill-<name>, stroke-<name>, etc.
+   Each --radius-* token is usable as rounded-<name>.
+   Each --shadow-* token is usable as shadow-<name>.
+
+   SURFACES (dark base, slate-950 anchored)
+     --color-surface-page      page background (the darkest layer)
+     --color-surface-raised    cards / panels sitting above the page
+     --color-surface-overlay   modals, dropdowns, popovers, tooltips
+     --color-surface-inset     wells / inputs / recessed content
+
+   BORDERS
+     --color-border-default    default hairline border on raised surfaces
+     --color-border-strong     emphasized border (hover, focus-adjacent)
+     --color-border-accent     accent-tinted border (active/selected state)
+
+   TEXT HIERARCHY
+     --color-text-primary      headings, primary content
+     --color-text-secondary    body copy, secondary content
+     --color-text-muted        captions, labels, meta info
+     --color-text-faint        disabled / placeholder / lowest-emphasis text
+
+   ACCENT SYSTEM (teal-cyan primary; fuchsia demoted to a sparing highlight)
+     --color-accent            primary interactive accent (links, active nav, icons)
+     --color-accent-strong     hover/pressed accent, high-emphasis accent text
+     --color-accent-soft       translucent accent wash (chip/badge backgrounds)
+     --color-highlight         fuchsia — sparing use only: rare callouts, "new"
+                                badges, one-off emphasis. Never a primary color.
+
+   RISK HEAT RAMP (the map + legends read this scale; low -> critical)
+     --color-risk-1 .. --color-risk-6   yellow -> amber -> orange -> red -> deep red
+
+   TREND SEMANTICS
+     --color-trend-rising       case counts trending up (red-ish)
+     --color-trend-stable       flat / no significant change (slate)
+     --color-trend-falling      case counts trending down (green-ish)
+
+   RADIUS
+     --radius-sm / -md / -lg / -xl / -2xl / -full
+
+   SHADOW / GLOW (subtle cyan glow for elevated/active cards)
+     --shadow-card          resting elevation for cards/panels
+     --shadow-elevated      stronger elevation (modals, popovers)
+     --shadow-glow          subtle accent glow (hover / active card)
+     --shadow-glow-strong   pronounced accent glow (focus / featured card)
+
+   ANIMATION UTILITY CLASSES (see bottom of file; not @theme-driven)
+     .animate-fade-up    content entrance, translate-up + fade-in
+     .animate-shimmer    loading-skeleton sheen sweep
+     .animate-pulse-dot  live/status indicator pulse
+     .animate-scale-in   pop-in entrance for modals/menus
+     All four are disabled under prefers-reduced-motion: reduce.
+   ========================================================================== */
+
 :root {
   --background: #020617;
   --foreground: #e2e8f0;
@@ -12,6 +72,58 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  /* Surfaces */
+  --color-surface-page: oklch(15% 0.02 260);
+  --color-surface-raised: oklch(21% 0.025 260);
+  --color-surface-overlay: oklch(24% 0.028 260);
+  --color-surface-inset: oklch(12% 0.018 260);
+
+  /* Borders */
+  --color-border-default: oklch(32% 0.02 260);
+  --color-border-strong: oklch(42% 0.025 260);
+  --color-border-accent: oklch(75% 0.12 195 / 35%);
+
+  /* Text hierarchy */
+  --color-text-primary: oklch(96% 0.01 260);
+  --color-text-secondary: oklch(84% 0.02 260);
+  --color-text-muted: oklch(68% 0.02 260);
+  --color-text-faint: oklch(52% 0.02 260);
+
+  /* Accent system: teal-cyan primary, fuchsia demoted to sparing highlight */
+  --color-accent: oklch(75% 0.13 195);
+  --color-accent-strong: oklch(65% 0.15 195);
+  --color-accent-soft: oklch(75% 0.1 195 / 15%);
+  --color-highlight: oklch(70% 0.24 330);
+
+  /* Risk heat ramp: yellow -> deep red */
+  --color-risk-1: oklch(87% 0.17 100);
+  --color-risk-2: oklch(80% 0.18 75);
+  --color-risk-3: oklch(73% 0.19 55);
+  --color-risk-4: oklch(64% 0.21 38);
+  --color-risk-5: oklch(54% 0.21 26);
+  --color-risk-6: oklch(38% 0.17 20);
+
+  /* Trend semantics */
+  --color-trend-rising: oklch(62% 0.2 25);
+  --color-trend-stable: oklch(65% 0.02 260);
+  --color-trend-falling: oklch(72% 0.16 150);
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadow / glow */
+  --shadow-card: 0 1px 2px 0 oklch(0% 0 0 / 30%), 0 1px 3px 0 oklch(0% 0 0 / 20%);
+  --shadow-elevated: 0 8px 24px -4px oklch(0% 0 0 / 45%), 0 2px 8px -2px oklch(0% 0 0 / 30%);
+  --shadow-glow: 0 0 0 1px oklch(75% 0.13 195 / 15%), 0 0 16px 0 oklch(75% 0.13 195 / 12%);
+  --shadow-glow-strong: 0 0 0 1px oklch(75% 0.13 195 / 30%), 0 0 28px 2px oklch(75% 0.13 195 / 22%);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -20,4 +132,83 @@ body {
 
 a {
   transition: color 160ms ease;
+}
+
+/* ==========================================================================
+   Animation keyframes + utilities
+   ========================================================================== */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 480ms ease-out both;
+}
+
+.animate-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(100% 0 0 / 8%) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 200ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-shimmer,
+  .animate-pulse-dot,
+  .animate-scale-in {
+    animation: none;
+  }
 }

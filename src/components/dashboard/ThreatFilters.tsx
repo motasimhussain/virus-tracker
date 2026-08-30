@@ -5,8 +5,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { TopThreat } from "@/lib/types";
 import { TopThreatPicker } from "@/components/dashboard/TopThreatPicker";
 import { VirusPicker } from "@/components/dashboard/VirusPicker";
+import { Card } from "@/components/ui/Card";
 
-type ThreatFiltersProps = {
+export type ThreatFiltersProps = {
   virusOptions: Array<{ slug: string; name: string }>;
   topThreats: TopThreat[];
   selectedVirusSlug: string | null;
@@ -48,9 +49,17 @@ export function ThreatFilters({
   }
 
   return (
-    <section className="grid gap-4 rounded-xl border border-cyan-500/25 bg-slate-900/70 p-4 md:grid-cols-2">
-      <VirusPicker options={virusOptions} selectedVirusSlug={selectedVirusSlug} onChange={(value) => updateParams({ virus: value })} />
-      <TopThreatPicker options={topThreats} selectedThreatKey={selectedThreatKey} onChange={(value) => updateParams({ threat: value })} />
-    </section>
+    <Card as="section" className="grid gap-4 md:grid-cols-2">
+      <VirusPicker
+        options={virusOptions}
+        selectedVirusSlug={selectedVirusSlug}
+        onChange={(value) => updateParams({ virus: value })}
+      />
+      <TopThreatPicker
+        options={topThreats}
+        selectedThreatKey={selectedThreatKey}
+        onChange={(value) => updateParams({ threat: value })}
+      />
+    </Card>
   );
 }

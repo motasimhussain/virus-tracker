@@ -1,0 +1,12 @@
+{
+  "result": 1,
+  "epidata": [
+    { "region": "nat", "epiweek": 202550, "wili": 2.1, "ili": 2.0, "num_ili": 12000, "num_patients": 550000 },
+    { "region": "nat", "epiweek": 202551, "wili": 2.6, "ili": 2.5, "num_ili": 14500, "num_patients": 560000 },
+    { "region": "nat", "epiweek": 202552, "wili": 3.4, "ili": 3.3, "num_ili": 18000, "num_patients": 570000 },
+    { "region": "hhs1", "epiweek": 202551, "wili": 4.0, "ili": 3.9, "num_ili": 2200, "num_patients": 48000 },
+    { "region": "hhs1", "epiweek": 202552, "wili": 3.2, "ili": 3.1, "num_ili": 1800, "num_patients": 47000 },
+    { "region": "hhs2", "epiweek": 202552, "wili": 1.8, "ili": 1.7, "num_ili": 900, "num_patients": 39000 }
+  ],
+  "message": "success"
+}

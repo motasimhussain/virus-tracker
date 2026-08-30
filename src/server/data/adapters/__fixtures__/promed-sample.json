@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "guid": "promed-20260101-cholera",
+      "title": "Cholera, diarrhea & dysentery update (05): Haiti",
+      "link": "https://promedmail.org/promed-post/?id=1111111",
+      "pubDate": "Thu, 01 Jan 2026 12:00:00 GMT",
+      "contentSnippet": "A ProMED-mail post reporting on the ongoing cholera outbreak in Haiti."
+    },
+    {
+      "guid": "promed-20260102-marburg",
+      "title": "Marburg virus disease - Rwanda (03)",
+      "link": "https://promedmail.org/promed-post/?id=2222222",
+      "pubDate": "Fri, 02 Jan 2026 09:30:00 GMT",
+      "contentSnippet": "Update on the Marburg virus disease outbreak in Rwanda."
+    },
+    {
+      "guid": "promed-20260103-general",
+      "title": "Undiagnosed illness, food safety recall notice",
+      "link": "https://promedmail.org/promed-post/?id=3333333",
+      "pubDate": "Sat, 03 Jan 2026 08:00:00 GMT",
+      "contentSnippet": "A general food safety notice unrelated to any tracked pathogen."
+    }
+  ]
+}
