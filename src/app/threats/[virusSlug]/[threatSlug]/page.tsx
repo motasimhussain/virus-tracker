@@ -9,7 +9,7 @@ import { env } from "@/lib/config";
 import { formatCompactNumber, METRIC_COPY, TREND_COPY } from "@/lib/copy";
 import { byAlpha2 } from "@/lib/iso-countries";
 import { getRiskLevel } from "@/lib/map-scale";
-import { deslugify, slugify } from "@/lib/seo";
+import { slugify } from "@/lib/seo";
 import { getDashboardSnapshot } from "@/server/dashboard-service";
 
 type ThreatPageProps = {
@@ -18,6 +18,22 @@ type ThreatPageProps = {
 
 function threatSlugFor(region: string, countryCode: string): string {
   return slugify(`${region}-${countryCode}`);
+}
+
+/**
+ * Human-readable place name for a hotspot. For country-level records
+ * `region` and `countryName` are the same string (e.g. both "India"), so
+ * naively joining them would render "India, India" — only join when the
+ * region is a distinct sub-national area.
+ */
+function formatPlaceName(threat: { locationLevel: string; admin1Name?: string; region: string; countryName: string }): string {
+  if (threat.locationLevel === "admin1" && threat.admin1Name) {
+    return `${threat.admin1Name}, ${threat.countryName}`;
+  }
+  if (threat.region && threat.region !== threat.countryName) {
+    return `${threat.region}, ${threat.countryName}`;
+  }
+  return threat.countryName;
 }
 
 /** Country flag from its ISO alpha-2 code, via the regional indicator symbol pair. */
@@ -30,15 +46,24 @@ function flagEmoji(alpha2: string): string {
 
 export async function generateMetadata({ params }: ThreatPageProps): Promise<Metadata> {
   const { virusSlug, threatSlug } = await params;
+  const snapshot = await getDashboardSnapshot();
+  const threat = snapshot.hotspots.find(
+    (item) => item.slug === virusSlug && threatSlugFor(item.region, item.countryCode) === threatSlug,
+  );
+  const placeName = threat ? formatPlaceName(threat) : threatSlug.replace(/-/g, " ");
+  const title = threat ? `${threat.virus} in ${placeName}` : `${placeName} Threat Analysis`;
+  const description = threat
+    ? `Threat intelligence for ${threat.virus} in ${placeName}: case counts, trend, and outlook.`
+    : `Threat intelligence for ${placeName} under ${virusSlug} monitoring.`;
   return {
-    title: `${deslugify(threatSlug)} Threat Analysis`,
-    description: `Threat intelligence for ${deslugify(threatSlug)} under ${virusSlug} monitoring.`,
+    title,
+    description,
     alternates: {
       canonical: `/threats/${virusSlug}/${threatSlug}`,
     },
     openGraph: {
-      title: `${deslugify(threatSlug)} Threat Analysis`,
-      description: `Threat intelligence for ${deslugify(threatSlug)} under ${virusSlug} monitoring.`,
+      title,
+      description,
       url: `${env.APP_URL}/threats/${virusSlug}/${threatSlug}`,
       type: "article",
     },
@@ -55,10 +80,7 @@ export default async function ThreatPage({ params }: ThreatPageProps) {
   if (!threat) return notFound();
 
   const flag = flagEmoji(threat.countryCode);
-  const placeName =
-    threat.locationLevel === "admin1" && threat.admin1Name
-      ? `${threat.admin1Name}, ${threat.countryName}`
-      : `${threat.region}, ${threat.countryName}`;
+  const placeName = formatPlaceName(threat);
   const countryName = byAlpha2(threat.countryCode)?.name ?? threat.countryName;
 
   const statusLine = threat.trend
