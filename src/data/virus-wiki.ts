@@ -24,7 +24,7 @@ const STANDARD_DISCLAIMER =
 const REGISTRY: Record<VirusSlug, VirusWikiContent> = {
   "covid-19": {
     slug: "covid-19",
-    lead: "COVID-19 is a respiratory disease caused by the SARS-CoV-2 virus. Global surveillance tracks cases, severity, and regional pressure to highlight emerging waves and healthcare stress.",
+    lead: "COVID-19 is a respiratory disease caused by the SARS-CoV-2 virus. We track case counts and severity worldwide to spot new waves early and see where hospitals are under strain.",
     overview:
       "Coronavirus disease 2019 (COVID-19) emerged as a pandemic pathogen with broad geographic spread. Surveillance combines laboratory-confirmed cases, mortality reporting, and recovery metrics. Variant dynamics and vaccination coverage continue to shape transmission intensity in different regions. Analysts watch lagging indicators such as hospital utilization alongside case counts. This wiki summarizes how Virus Tracker surfaces country-level and subnational signals so operators can compare relative burden across geographies. Data blends open feeds and resilient fallbacks; confidence metadata helps interpret uncertainty where reporting is uneven.",
     transmission:
