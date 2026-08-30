@@ -20,7 +20,7 @@
 
 const DEFAULT_APP_URL = "https://virus-tracker.com";
 
-export default async () => {
+const scheduledIngestion = async () => {
   // APP_URL is this project's own canonical-domain config var (see
   // src/lib/config.ts); Netlify also injects `URL` (the site's primary
   // deploy URL) automatically, which is used as a fallback so this works
@@ -60,6 +60,8 @@ export default async () => {
     );
   }
 };
+
+export default scheduledIngestion;
 
 export const config = {
   schedule: "*/30 * * * *",

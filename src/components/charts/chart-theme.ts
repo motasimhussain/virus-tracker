@@ -83,15 +83,21 @@ export const CHART_ANIMATION_DURATION = 900;
  * users who've asked for reduced motion. Defaults to `false` during SSR/
  * first paint (matchMedia isn't available server-side) and syncs on mount.
  */
+function getInitialReducedMotion(): boolean {
+  if (typeof window === "undefined" || !window.matchMedia) {
+    return false;
+  }
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
+  const [reduced, setReduced] = useState(getInitialReducedMotion);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
       return;
     }
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(query.matches);
 
     const handleChange = (event: MediaQueryListEvent) => setReduced(event.matches);
     query.addEventListener("change", handleChange);
