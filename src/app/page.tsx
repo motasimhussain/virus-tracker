@@ -239,21 +239,23 @@ export default async function Home({ searchParams }: HomePageProps) {
           title="Trajectory and hotspots"
           description="Where the leading threat is headed next, and the places seeing the most active cases today."
         />
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="min-w-0 lg:col-span-2">
             <TrajectoryChart points={leadVirus?.trajectory ?? []} />
           </div>
-          <HeatList items={filteredView.filteredHotspots.slice(0, 20)} />
+          <div className="min-w-0">
+            <HeatList items={filteredView.filteredHotspots.slice(0, 20)} />
+          </div>
         </div>
       </Reveal>
 
       <section className="space-y-4">
         <SectionHeader title="Latest news" description="Recent coverage from public health sources, as it comes in." />
-        <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-          <Reveal delay={0.4}>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <Reveal delay={0.4} className="min-w-0">
             <NewsFeed items={snapshot.news.slice(0, 20)} />
           </Reveal>
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <AdSlot placement="sidebar" slotName="Sidebar Rail 300x600" />
             <AdSlot placement="in-feed" slotName="In-Feed 336x280" />
           </div>

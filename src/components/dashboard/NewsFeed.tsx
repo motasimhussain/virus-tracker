@@ -34,7 +34,7 @@ export function NewsFeed({ items }: NewsFeedProps) {
             href={item.link}
             target="_blank"
             rel="noreferrer"
-            className="group flex items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-surface-inset"
+            className="group flex min-w-0 items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-surface-inset"
           >
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-text-primary transition-colors group-hover:text-accent">
