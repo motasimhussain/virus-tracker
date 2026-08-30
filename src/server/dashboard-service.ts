@@ -1,18 +1,26 @@
 import { env } from "@/lib/config";
-import type { DashboardSnapshot, FilteredDashboardView, VirusSnapshot } from "@/lib/types";
+import type {
+  DashboardSnapshot,
+  FilteredDashboardView,
+  RegionMetric,
+  Trend,
+  VirusSnapshot,
+} from "@/lib/types";
 import {
   buildSeverityByRegion,
   buildThreatMatrixPoints,
   buildThreatMetricsSummary,
   buildTopThreats,
+  classifyTrendFromTrajectory,
   filterHotspotsByThreat,
   filterHotspotsByVirus,
   getRegionOptions,
   getVirusOptions,
   mergeVirusSnapshots,
   rankHotspots,
+  selectTrajectory,
 } from "@/server/analysis";
-import { runIngestion } from "@/server/data/ingestion";
+import { runIngestion, type IngestionState } from "@/server/data/ingestion";
 import {
   getSnapshotFromSharedCache,
   setSnapshotToSharedCache,
@@ -32,11 +40,31 @@ const globalCache = globalThis as typeof globalThis & {
   refreshInFlight?: Promise<DashboardSnapshot>;
 };
 
-function applyFallbackTrajectory(viruses: VirusSnapshot[]): VirusSnapshot[] {
-  return viruses.map((virus) => ({
-    ...virus,
-    trajectory: fallbackTrajectory[virus.slug] ?? virus.trajectory,
-  }));
+/**
+ * Resolves each virus's final trajectory: a real (non-synthetic) trajectory
+ * from `ingestion.trajectories` wins when the provider succeeded; otherwise
+ * falls back to the curated fallback-data.ts series (or, if there isn't one
+ * for this slug, the synthetic buildTrajectory projection mergeVirusSnapshots
+ * already attached) — both stamped isSynthetic: true by selectTrajectory.
+ */
+function resolveVirusTrajectories(
+  viruses: VirusSnapshot[],
+  realTrajectories: IngestionState["trajectories"],
+): VirusSnapshot[] {
+  return viruses.map((virus) => {
+    const fallback = fallbackTrajectory[virus.slug] ?? virus.trajectory;
+    return {
+      ...virus,
+      trajectory: selectTrajectory(realTrajectories[virus.slug], fallback),
+    };
+  });
+}
+
+/** Fills a metric's `trend` from the virus-level trajectory when the adapter didn't already set one. */
+function backfillTrend(metric: RegionMetric, trendBySlug: Map<string, Trend | undefined>): RegionMetric {
+  if (metric.trend) return metric;
+  const trend = trendBySlug.get(metric.slug);
+  return trend ? { ...metric, trend } : metric;
 }
 
 export async function getDashboardSnapshot(forceRefresh = false): Promise<DashboardSnapshot> {
@@ -81,15 +109,37 @@ function hydrateL1FromEnvelope(payload: CacheEnvelope) {
 
 async function refreshSnapshot(): Promise<DashboardSnapshot> {
   const ingestion = await runIngestion();
-  const viruses = applyFallbackTrajectory(mergeVirusSnapshots(ingestion.metrics));
-  const hotspots = rankHotspots(ingestion.metrics);
+
+  const groupedViruses = mergeVirusSnapshots(ingestion.metrics);
+  const viruses = resolveVirusTrajectories(groupedViruses, ingestion.trajectories);
+
+  // Trend classification derived from each virus's final (real-or-fallback)
+  // trajectory, used to backfill RegionMetric.trend for metrics whose
+  // adapter didn't already compute one (e.g. disease.sh, ecdc, who-gho).
+  const trendBySlug = new Map<string, Trend | undefined>(
+    viruses.map((virus) => [virus.slug, classifyTrendFromTrajectory(virus.trajectory)]),
+  );
+
+  const finalViruses = viruses.map((virus) => ({
+    ...virus,
+    metrics: virus.metrics.map((metric) => backfillTrend(metric, trendBySlug)),
+  }));
+  const hotspots = rankHotspots(ingestion.metrics).map((metric) => backfillTrend(metric, trendBySlug));
+
   const generatedAtMs = Date.now();
+  const healthySources = ingestion.sourceHealth.filter((item) => item.healthy).length;
+  const totalSources = ingestion.sourceHealth.length;
 
   const snapshot: DashboardSnapshot = {
     generatedAt: new Date(generatedAtMs).toISOString(),
-    viruses,
+    viruses: finalViruses,
     hotspots,
     news: ingestion.news,
+    dataFreshness: {
+      lastRunAt: new Date(generatedAtMs).toISOString(),
+      healthySources,
+      totalSources,
+    },
   };
 
   const envelope: CacheEnvelope = {

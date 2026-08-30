@@ -18,7 +18,7 @@ Virus Tracker is an SSR-first Next.js application for monitoring global virus sp
 - Runtime validation with Zod
 - RSS parsing via `rss-parser`
 - Vitest for unit tests
-- Optional local Postgres + Redis via Docker Compose
+- Supabase (Postgres) for shared snapshot cache and ingestion history
 
 ## Local Development
 
@@ -77,8 +77,8 @@ Required environment variables on Netlify:
 - `INGESTION_TTL_SECONDS` (recommended: `1800`)
 - `REVALIDATE_SECONDS` (recommended: `1800`)
 - `INGESTION_ADMIN_KEY` (optional but recommended)
-- `UPSTASH_REDIS_REST_URL` (recommended for shared cache across function instances)
-- `UPSTASH_REDIS_REST_TOKEN` (recommended for shared cache across function instances)
+- `SUPABASE_URL` (recommended for shared cache + ingestion history across function instances)
+- `SUPABASE_SERVICE_ROLE_KEY` (recommended for shared cache + ingestion history across function instances)
 
 SWR behavior:
 - API routes serve cached snapshots with `Cache-Control: public, s-maxage=1800, stale-while-revalidate=1800`.
