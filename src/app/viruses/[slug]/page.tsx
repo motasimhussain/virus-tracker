@@ -212,9 +212,9 @@ export default async function VirusDetailsPage({ params }: VirusDetailsPageProps
       answer: wiki.disclaimer,
     },
     {
-      question: "What does the pressure index mean on Virus Tracker?",
+      question: "What does \"outbreak activity\" mean on Virus Tracker?",
       answer:
-        "Pressure index reflects active-case burden relative to recoveries in our models. It helps compare stressed outbreak zones within the dataset—it is not a clinical score.",
+        "Outbreak activity reflects active-case burden relative to recoveries in our models. It helps compare stressed outbreak zones within the dataset—it is not a clinical score.",
     },
     {
       question: "How often is this wiki updated?",
